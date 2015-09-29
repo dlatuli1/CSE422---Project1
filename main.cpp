@@ -7,6 +7,8 @@ using namespace std;
 
 int parse_input_line(vector<string>& argvector);
 
+vector<string> commandHistory;
+
 int main(int argc, char* argv[])
 {
 	cout << "sish >>";
@@ -28,6 +30,7 @@ int parse_input_line(vector<string>& arg_vector)
 	string input = "";
 	size_t delimiter = 0;
 	getline(cin, input);
+	commandHistory.push_back(input);
 	while(delimiter!=string::npos)
 	{
 		delimiter = input.find(' ');
