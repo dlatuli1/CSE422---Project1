@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 #include <deque>
+#include <algorithm>
 
 using namespace std;
 
 deque<string> commandHistory;
 int parse_input_line(vector<string>& argvector);
 int history(string historyStr);
+bool built_in_command(string arg);
 
 int main(int argc, char* argv[])
 {
@@ -92,10 +94,18 @@ int history(string historyStr)
 }
 
 
-
-
-
-
+// verify if argument is a built-in command
+bool built_in_command(string arg) {
+    
+    // array of built-in commands
+    static const string built_in_commands_array[] = {"exit", "clr", "echo", "show", "environ", "export", "unexport", "set", "unset", "dir", "chdir", "history", "repeat", "kill", "fork", "pause", "wait", "help"};
+    // make a vector of built-in commands using the above array
+    vector<string> built_in_commands (built_in_commands_array, built_in_commands_array + sizeof(built_in_commands_array) / sizeof(built_in_commands_array[0]) );
+    if (find(built_in_commands.begin(), built_in_commands.end(), arg) != built_in_commands.end())
+        return true;
+    else
+        return false;
+}
 
 
 
