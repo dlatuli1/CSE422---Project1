@@ -2,7 +2,6 @@
 #include <algorithm>
 
 #include "main.h"
-#include "Commands.h"
 
 using namespace std;
 
@@ -11,7 +10,6 @@ int main(int argc, char* argv[])
    vector<string> argvector;
    for (;;)
    {
-      cout << "sish >>";
       parse_input_line(argvector);
 
       execute_command(argvector);
@@ -39,7 +37,7 @@ int execute_command(vector<string>& argVector)
    else if (argVector[0] == "echo")     echo(argVector);
    else if (argVector[0] == "help")     help(argVector);
    else if (argVector[0] == "pause")    pause(argVector);
-   else if (argVector[0] == "history")  history(argVector[1]);
+   else if (argVector[0] == "history")  history(argVector);
    else
    {
       cout << "TBD";
@@ -50,32 +48,26 @@ int execute_command(vector<string>& argVector)
 
 int parse_input_line(vector<string>& arg_vector)
 {
-   string input = "";
-   size_t delimiter = 0;
+	string input = "";
+	size_t delimiter = 0;
 
-   getline(cin, input);
+	cout << "sish >>";
+	getline(cin, input);
 
-   if (commandHistory.size() >= 100) //limit history deque size to 100
-   {
-      commandHistory.erase(commandHistory.begin());
-   }
-   commandHistory.push_back(input);
+	if (ShellCommandHistory::HistorySize() >= 100) ShellCommandHistory::TrimOld(); //limit history deque size to 100
+	ShellCommandHistory::PushNew(input);
 
-   while (delimiter != string::npos)
-   {
-      delimiter = input.find(' ');
-      if (delimiter != string::npos)
-      {
-         arg_vector.push_back(input.substr(0, delimiter));
-         input.erase(0, delimiter + 1);
-      }
-      else
-      {
-         arg_vector.push_back(input.substr(0, string::npos));
-
-      }
-   }
-   return 0;
+	while (delimiter != string::npos)
+	{
+		delimiter = input.find(' ');
+		if (delimiter != string::npos)
+		{
+			arg_vector.push_back(input.substr(0, delimiter));
+			input.erase(0, delimiter + 1);
+		}
+		else arg_vector.push_back(input.substr(0, string::npos));
+	}
+	return 0;
 }
 
 
