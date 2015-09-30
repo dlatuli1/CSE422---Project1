@@ -87,24 +87,23 @@ int pause(vector<string>argVector)
 }
 
 // implemeting history command
-// should be pretty close, TODO - no error handling other than isdigit
-int history(string historyStr)
+int history(vector<string> argvector)
 {
-   int lineNum = 0, historyNum = 0;
+	unsigned int count = 0, history_asked = 0;
+	if (argvector.size() > 1)
+	{
+		if (isdigit(argvector[1][0])) history_asked = atoi(argvector[1].c_str());  //converting string parameter to int
+	}
 
-   if (isdigit(historyStr[0])) historyNum = atoi(historyStr.c_str());
-   else return 1;
-   if (historyNum < commandHistory.size())
-   {
-      for (unsigned int i = (commandHistory.size() - historyNum - 1); i < commandHistory.size() - 1; i++)  // '-1's are so current history command is not printed to console;
-      {
-         ++lineNum;
-         cout << '\t' << lineNum << "  " << commandHistory[i] << '\n';
-      }
-   }
-   else
-   {
-      //error stuff?
-   }
-   return 0;
+	if ((history_asked >= ShellCommandHistory::HistorySize()) || (history_asked == 0))
+	{
+		history_asked = ShellCommandHistory::HistorySize() - 1; //trimming max history asked to current size
+	}
+
+	for (unsigned int i = (ShellCommandHistory::HistorySize() - history_asked - 1); i < ShellCommandHistory::HistorySize() - 1; i++)  // '-1's are so current history command is not printed to console;
+	{
+		cout << '\t' << ++count << "  " << ShellCommandHistory::Get(i) << '\n';
+	}
+
+	return 0;
 }
