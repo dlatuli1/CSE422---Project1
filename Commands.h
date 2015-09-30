@@ -17,4 +17,4 @@ int dir(vector<string>argVector);
 int echo(vector<string>argVector);
 int help(vector<string>argVector);
 int pause(vector<string>argVector);
-int history(string historyStr);
+int history(vector<string>argVector);
