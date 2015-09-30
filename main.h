@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
-#include <deque>
-
+#include "Commands.h"
+#include "Classes.h"
 using namespace std;
 
 static deque<string> commandHistory;
