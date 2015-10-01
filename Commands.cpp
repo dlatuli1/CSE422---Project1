@@ -106,29 +106,87 @@ int clr(vector<string>argVector)
 
 int dir(vector<string>argVector)
 {
-   //Execute dir command
-   return 0;
+	//Execute dir command
+	char workingDir_Cstr[FILENAME_MAX];
+	vector<string> dirContents;
+	GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
+	string workingDir(workingDir_Cstr);
+
+	cout << workingDir << '\n';
+
+#ifdef WINDOWS
+	workingDir = workingDir + "\\*";
+	WIN32_FIND_DATA fileData;
+	HANDLE hFind;
+	hFind = FindFirstFile(workingDir.c_str(), &fileData);
+	if (hFind == INVALID_HANDLE_VALUE)
+	{
+		cout << "\n Failure accessing directory\n";
+		return 0;
+	}
+	while (FindNextFile(hFind, &fileData))
+	{
+		if (fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+		{
+			cout << "\t <DIR> " << fileData.cFileName << '\n';
+		}
+		else
+		{
+			cout << "\t" << fileData.cFileName << '\n';
+		}
+	}
+#else
+	DIR *dp;
+	struct dirent *dirp;
+	string DIRstr;
+
+	if ((dp = opendir(workingDir.c_str())) == NULL)
+	{
+		cout << "\n Failure accessing directory\n";
+		return 0;
+	}
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		if (dirp->d_type == DT_DIR)
+		{
+        		DIRstr = dirp->d_name;
+			if ((DIRstr != ".") && (DIRstr != "..")) cout << "\t <DIR> " << dirp->d_name << '\n';
+		}
+		else
+		{
+			cout << "\t" << dirp->d_name << '\n';
+		}
+	}
+	closedir(dp);
+
+#endif
+	return 0;
 }
 
 int echo(vector<string>argVector)
 {
-   //Execute echo command
-   return 0;
+	//Execute echo command
+	for (unsigned int i = 1; i < argVector.size(); i++)
+	{
+		cout << argVector[i] << ' ';
+	}
+	cout << '\n';
+	return 0;
 }
 
 int help(vector<string>argVector)
 {
-   //Execute help command
-   return 0;
+	//Execute help command
+	return 0;
 }
 
 int pause(vector<string>argVector)
 {
-   //Execute pause command
-   return 0;
+	//Execute pause command
+	return 0;
 }
 
-// implemeting history command
+//history command
 int history(vector<string> argvector)
 {
 	unsigned int count = 0, history_asked = 0;
@@ -146,6 +204,6 @@ int history(vector<string> argvector)
 	{
 		cout << '\t' << ++count << "  " << ShellCommandHistory::Get(i) << '\n';
 	}
-
 	return 0;
 }
+
