@@ -1,6 +1,18 @@
 #include <vector>
 #include <string>
 
+#include <stdio.h> 
+#include <stdlib.h>
+#ifdef WINDOWS
+#include <direct.h>
+#include <Windows.h>
+#define GetWorkingDir _getcwd
+#else
+#include <unistd.h>
+#include <dirent.h>
+#define GetWorkingDir getcwd
+#endif
+
 using namespace std;
 
 int show(vector<string> argVector);
