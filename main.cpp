@@ -8,11 +8,25 @@ using namespace std;
 int main(int argc, char* argv[])
 {
    vector<string> argvector;
+   
+	//Temporary variable to get concept into code -- may want some way to return status to main from commands like pause, exit, etc. 
+	//for now im just setting shellStatus to 1 on pause(definitely not final way), and waiting in main. 
+	//I can also do the wait-loop within the command -- let me know what you guys think. pretty simple either way
+	int shellStatus;
+	
    for (;;)
    {
-      parse_input_line(argvector);
+    	parse_input_line(argvector);
 
-      execute_command(argvector);
+		shellStatus = execute_command(argvector);
+		
+		//see note above
+		if (shellStatus == 1) 
+		{
+			string unpause;
+			getline(cin, unpause);
+			continue;
+		}
 
 
 
@@ -36,7 +50,7 @@ int execute_command(vector<string>& argVector)
    else if (argVector[0] == "dir")      dir(argVector);
    else if (argVector[0] == "echo")     echo(argVector);
    else if (argVector[0] == "help")     help(argVector);
-   else if (argVector[0] == "pause")    pause(argVector);
+   else if (argVector[0] == "pause")    return pause(argVector);
    else if (argVector[0] == "history")  history(argVector);
    else
    {
