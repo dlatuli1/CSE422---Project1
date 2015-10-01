@@ -183,7 +183,13 @@ int help(vector<string>argVector)
 int pause(vector<string>argVector)
 {
 	//Execute pause command
-	return 0;
+
+	cout << "\n------------------------------\n\tsish paused:\n\tPress Enter to resume\n------------------------------\n";
+
+	//either put the waiting loop here, 
+	//or expand on the returns for Shell operation functions like pause and exit
+
+	return 1;
 }
 
 //history command
