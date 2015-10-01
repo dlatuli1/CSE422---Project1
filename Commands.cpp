@@ -54,7 +54,7 @@ int exportVariable(vector<string>argVector)
         delete cStringArg1;
         delete cStringArg2;
     } else {
-        cout << "Usage: set W1 W2" << endl;
+        cout << "Usage: export W1 W2" << endl;
     }
    return 0;
 }
