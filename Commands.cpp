@@ -1,6 +1,9 @@
 #include "Commands.h"
 #include "main.h"
 #include <iostream>
+#include <map>
+
+map<string string> localVariable;
 
 int show(vector<string> argVector)
 {
@@ -8,13 +11,17 @@ int show(vector<string> argVector)
    return 0;
 }
 
-int set(vector<string>argVector)
+int set(vector<string> argVector)
 {
    //Execute set command
+    if (argVector.size == 3) {
+        localVariable[argVector[1]] = new string();
+        localVariable[argVector[1]] = argVector[2];
+    }
    return 0;
 }
 
-int unset(vector<string>argVector)
+int unset(vector<string> argVector)
 {
    //Execute unset command
    return 0;
