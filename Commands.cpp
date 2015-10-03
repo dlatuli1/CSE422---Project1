@@ -1,112 +1,127 @@
-#include "Commands.h"
-#include "main.h"
-#include <iostream>
-#include <map>
-#include <string>
-#include <stdlib.h>
+#include "Command.h"
 
-map<string, string*> localVariable;
-
-int show(vector<string> argVector)
+Command::Command()
 {
+}
+
+Command::~Command()
+{
+}
+
+int Command::Execute()
+{
+   return 0;
+}
+
+int CommandSHOW::Execute(vector<string> argVector)
+{
+   cout << "Executing show command" << endl;
    //Execute show command
-    for (int i = 1; i < argVector.size(); i++) {
-        cout << argVector[i] << endl;
-    }
+   for (int i = 1; i < argVector.size(); i++) {
+       cout << argVector[i] << endl;
+   }
    return 0;
 }
 
-int set(vector<string> argVector)
+int CommandSET::Execute(vector<string> argVector)
 {
+   cout << "Executing set command" << endl;
    //Execute set command
-    if (argVector.size() == 3) {
-        localVariable[argVector[1]] = new string();
-        localVariable[argVector[1]] = &argVector[2];
-    } else {
-        cout << "Usage: set W1 W2" << endl;
-    }
+   if (argVector.size() == 3) {
+       localVariable[argVector[1]] = argVector[2];
+   } else {
+       cout << "Usage: set W1 W2" << endl;
+   }
    return 0;
 }
 
-int unset(vector<string> argVector)
+int CommandUNSET::Execute(vector<string> argVector)
 {
+   cout << "Executing unset command" << endl;
    //Execute unset command
-    if (argVector.size() == 2) {
-        if (localVariable[argVector[1]]) {
-            delete localVariable[argVector[1]];
-        }
-    } else {
-        cout << "Usage: unset W" << endl;
-    }
+   if (argVector.size() == 2) {
+		localVariable[argVector[1]].erase();
+       }
+   else {
+       cout << "Usage: unset W" << endl;
+   }
    return 0;
 }
 
-int exportVariable(vector<string>argVector)
+int CommandEXPORT::Execute(vector<string> argVector)
 {
+   cout << "Executing export command" << endl;
    //Execute export command
-    if (argVector.size() == 3) {
-        // since setenv() takes char* type, we have to first convert the arguments into char*
-        char *cStringArg1 = new char[argVector[1].length() + 1];
-        char *cStringArg2 = new char[argVector[2].length() + 1];
-        strcpy(cStringArg1, argVector[1].c_str());
-        strcpy(cStringArg2, argVector[2].c_str());
-        setenv(cStringArg1, cStringArg2, true);
-        delete cStringArg1;
-        delete cStringArg2;
-    } else {
-        cout << "Usage: export W1 W2" << endl;
-    }
+   if (argVector.size() == 3) {
+       // since setenv() takes char* type, we have to first convert the arguments into char*
+       char *cStringArg1 = new char[argVector[1].length() + 1];
+       char *cStringArg2 = new char[argVector[2].length() + 1];
+       strcpy(cStringArg1, argVector[1].c_str());
+       strcpy(cStringArg2, argVector[2].c_str());
+       //setenv(cStringArg1, cStringArg2, true);
+       delete cStringArg1;
+       delete cStringArg2;
+   } else {
+       cout << "Usage: export W1 W2" << endl;
+   }
    return 0;
 }
 
-int unexport(vector<string>argVector)
+int CommandUNEXPORT::Execute(vector<string> argVector)
 {
+   cout << "Executing unexport command" << endl;
    //Execute unexport command
-    if (argVector.size() == 2) {
-        // since unsetenv() takes char* type, we have to first convert the arguments into char*
-        char *cStringArg = new char[argVector[1].length() + 1];
-        strcpy(cStringArg, argVector[1].c_str());
-        unsetenv(cStringArg);
-        delete cStringArg;
-    } else {
-        cout << "Usage: unexport W" << endl;
-    }
+   if (argVector.size() == 2) {
+       // since unsetenv() takes char* type, we have to first convert the arguments into char*
+       char *cStringArg = new char[argVector[1].length() + 1];
+       strcpy(cStringArg, argVector[1].c_str());
+       //unsetenv(cStringArg);
+       delete cStringArg;
+   } else {
+       cout << "Usage: unexport W" << endl;
+   }
    return 0;
 }
 
-int environCommand(vector<string>argVector)
+int CommandENVIRON::Execute(vector<string> argVector)
 {
+   cout << "Executing environ command" << endl;
    //Execute environ command
    return 0;
 }
 
-int chdir(vector<string>argVector)
+int CommandCHDIR::Execute(vector<string> argVector)
 {
+   cout << "Executing chdir command" << endl;
    //Execute chdir command
    return 0;
 }
 
-int exit(vector<string>argVector)
+int CommandEXIT::Execute(vector<string> argVector)
 {
+   cout << "Executing exit command" << endl;
    //Execute exit command
    return 0;
 }
 
-int wait(vector<string>argVector)
+int CommandWAIT::Execute(vector<string> argVector)
 {
+   cout << "Executing wait command" << endl;
    //Execute wait command
    return 0;
 }
 
-int clr(vector<string>argVector)
+int CommandCLR::Execute(vector<string> argVector)
 {
+   cout << "Executing clr command" << endl;
    //Execute clr command
    return 0;
 }
 
-int dir(vector<string>argVector)
+int CommandDIR::Execute(vector<string> argVector)
 {
-	//Execute dir command
+   cout << "Executing dir command" << endl;
+   	//Execute dir command
 	char workingDir_Cstr[FILENAME_MAX];
 	vector<string> dirContents;
 	GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
@@ -118,7 +133,7 @@ int dir(vector<string>argVector)
 	workingDir = workingDir + "\\*";
 	WIN32_FIND_DATA fileData;
 	HANDLE hFind;
-	hFind = FindFirstFile(workingDir.c_str(), &fileData);
+	//hFind = FindFirstFile(workingDir.c_str(), &fileData);
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
 		cout << "\n Failure accessing directory\n";
@@ -163,8 +178,9 @@ int dir(vector<string>argVector)
 	return 0;
 }
 
-int echo(vector<string>argVector)
+int CommandECHO::Execute(vector<string> argVector)
 {
+   cout << "Executing echo command" << endl;
 	//Execute echo command
 	for (unsigned int i = 1; i < argVector.size(); i++)
 	{
@@ -174,14 +190,16 @@ int echo(vector<string>argVector)
 	return 0;
 }
 
-int help(vector<string>argVector)
+int CommandHELP::Execute(vector<string> argVector)
 {
+   cout << "Executing help command" << endl;
 	//Execute help command
 	return 0;
 }
 
-int pause(vector<string>argVector)
+int CommandPAUSE::Execute(vector<string> argVector)
 {
+   cout << "Executing pause command" << endl;
 	//Execute pause command
 
 	cout << "\n------------------------------\n\tsish paused:\n\tPress Enter to resume\n------------------------------\n";
@@ -192,23 +210,23 @@ int pause(vector<string>argVector)
 	return 1;
 }
 
-//history command
-int history(vector<string> argvector)
+int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHistory)
 {
+   cout << "Executing history command" << endl;
 	unsigned int count = 0, history_asked = 0;
-	if (argvector.size() > 1)
+	if (argVector.size() > 1)
 	{
-		if (isdigit(argvector[1][0])) history_asked = atoi(argvector[1].c_str());  //converting string parameter to int
+		if (isdigit(argVector[1][0])) history_asked = atoi(argVector[1].c_str());  //converting string parameter to int
 	}
 
-	if ((history_asked >= ShellCommandHistory::HistorySize()) || (history_asked == 0))
+	if ((history_asked >= ShellCommandHistory->HistorySize()) || (history_asked == 0))
 	{
-		history_asked = ShellCommandHistory::HistorySize() - 1; //trimming max history asked to current size
+		history_asked = ShellCommandHistory->HistorySize() - 1; //trimming max history asked to current size
 	}
 
-	for (unsigned int i = (ShellCommandHistory::HistorySize() - history_asked - 1); i < ShellCommandHistory::HistorySize() - 1; i++)  // '-1's are so current history command is not printed to console;
+	for (unsigned int i = (ShellCommandHistory->HistorySize() - history_asked - 1); i < ShellCommandHistory->HistorySize() - 1; i++)  // '-1's are so current history command is not printed to console;
 	{
-		cout << '\t' << ++count << "  " << ShellCommandHistory::Get(i) << '\n';
+		cout << '\t' << ++count << "  " << ShellCommandHistory->Get(i) << '\n';
 	}
 	return 0;
 }
