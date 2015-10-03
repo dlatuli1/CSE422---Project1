@@ -1,7 +1,5 @@
-#include <iostream>
 #include <vector>
 #include <string>
-#include <map>
 
 #include <stdio.h> 
 #include <stdlib.h>
@@ -15,115 +13,20 @@
 #define GetWorkingDir getcwd
 #endif
 
-#ifndef History_h
-#define History_h
-#include "History.h"
-#endif 
-
 using namespace std;
 
-class Command
-{
-private:
-   
-
-public:
-
-   Command();
-
-   ~Command();
-
-   int Execute();
-
-   map<string, string> localVariable;
-};
-
-class CommandSHOW : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandSET : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandUNSET : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandEXPORT : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandUNEXPORT : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandENVIRON : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandCHDIR : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandEXIT : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandWAIT : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandCLR : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandDIR : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandECHO : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandHELP : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandPAUSE : Command
-{
-public:
-   int Execute(vector<string> argVector);
-};
-
-class CommandHISTORY : Command
-{
-public:
-   int Execute(vector<string> argVector, History* ShellCommandHistory);
-};
+int show(vector<string> argVector);
+int set(vector<string>argVector);
+int unset(vector<string>argVector);
+int exportVariables(vector<string>argVector);
+int unexport(vector<string>argVector);
+int environCommand(vector<string>argVector);
+int chdir(vector<string>argVector);
+int exit(vector<string>argVector);
+int wait(vector<string>argVector);
+int clr(vector<string>argVector);
+int dir(vector<string>argVector);
+int echo(vector<string>argVector);
+int help(vector<string>argVector);
+int pause(vector<string>argVector);
+int history(vector<string>argVector);
