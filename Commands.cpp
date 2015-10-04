@@ -39,10 +39,12 @@ int CommandUNSET::Execute(vector<string> argVector)
 {
    cout << "Executing unset command" << endl;
    //Execute unset command
-   if (argVector.size() == 2) {
-		localVariable[argVector[1]].erase();
-       }
-   else {
+   if (argVector.size() == 2)
+   {
+		localVariable.erase(argVector[1]);
+   }
+   else 
+   {
        cout << "Usage: unset W" << endl;
    }
    return 0;
