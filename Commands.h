@@ -1,10 +1,13 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <vector>
 #include <string>
 #include <map>
-
-#include <stdio.h> 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+
+
 #ifdef WINDOWS
 #include <direct.h>
 #include <Windows.h>
@@ -18,14 +21,14 @@
 #ifndef History_h
 #define History_h
 #include "History.h"
-#endif 
+#endif
 
 using namespace std;
 
 class Command
 {
 private:
-   
+
 
 public:
 
@@ -34,8 +37,16 @@ public:
    ~Command();
 
    int Execute();
-
    map<string, string> localVariable;
+   enum ShellStates
+   {
+	   Go,
+	   Pause,
+	   Wait,
+	   Kill,
+	   Exit
+   };
+   ShellStates shellStatus;
 };
 
 class CommandSHOW : Command
@@ -119,7 +130,7 @@ public:
 class CommandPAUSE : Command
 {
 public:
-   int Execute(vector<string> argVector);
+   ShellStates Execute(vector<string> argVector);
 };
 
 class CommandHISTORY : Command
