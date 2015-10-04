@@ -17,7 +17,7 @@ int CommandSHOW::Execute(vector<string> argVector)
 {
    cout << "Executing show command" << endl;
    //Execute show command
-   for (int i = 1; i < argVector.size(); i++) {
+   for (unsigned int i = 1; i < argVector.size(); i++) {
        cout << argVector[i] << endl;
    }
    return 0;
@@ -133,7 +133,7 @@ int CommandDIR::Execute(vector<string> argVector)
 	workingDir = workingDir + "\\*";
 	WIN32_FIND_DATA fileData;
 	HANDLE hFind;
-	//hFind = FindFirstFile(workingDir.c_str(), &fileData);
+	hFind = FindFirstFile(workingDir.c_str(), &fileData);
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
 		cout << "\n Failure accessing directory\n";
@@ -197,17 +197,17 @@ int CommandHELP::Execute(vector<string> argVector)
 	return 0;
 }
 
-int CommandPAUSE::Execute(vector<string> argVector)
+Command::ShellStates CommandPAUSE::Execute(vector<string> argVector)
 {
    cout << "Executing pause command" << endl;
 	//Execute pause command
 
 	cout << "\n------------------------------\n\tsish paused:\n\tPress Enter to resume\n------------------------------\n";
 
-	//either put the waiting loop here, 
+	//either put the waiting loop here,
 	//or expand on the returns for Shell operation functions like pause and exit
 
-	return 1;
+	return  Pause;
 }
 
 int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHistory)
@@ -230,4 +230,6 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
 	}
 	return 0;
 }
+
+
 
