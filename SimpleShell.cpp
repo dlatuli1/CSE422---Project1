@@ -4,7 +4,6 @@ SimpleShell::SimpleShell()
 {
    ShellCommandHistory = new History();
    ShellCommand = new Command();
-//   ShellController = new ShellControl();
 }
 
 SimpleShell::~SimpleShell()
@@ -58,7 +57,78 @@ int SimpleShell::ParseInputLine()
 		}
 		else argVector.push_back(input.substr(0, string::npos));
 	}
+	VariableSub();
 	return 0;
+}
+
+// subs in variable values before commands are exectuted - Called by ParseInputLine()
+// will erase vector value if found that user is trying to set a special variable to something else
+// need to work on ! and ? - values from foreground command and background command.
+// may want to look into implications with export/unexport?
+// echo will not be effected - is this right? i think so
+// History deque will not be effected
+void SimpleShell::VariableSub()
+{
+	size_t variablePlace = 0;
+	string varString;
+	ostringstream shellPid;
+	ostringstream foregroundVal;
+	ostringstream backgroundPid;
+
+	shellPid << getppid(); //should it be getpid??
+    if (ForegroudProcesses.size()) foregroundVal << ForegroudProcesses[ForegroudProcesses.size()-1]; // does nothing now. look into foreground process history stuff
+	if (BackgroudProcesses.size())backgroundPid << BackgroudProcesses[BackgroudProcesses.size()-1];  // does nothing now, look into background process history stuff
+
+	if (argVector[0] != "echo") //  ignore this for echo
+	{
+		for (unsigned int i = 0; i < argVector.size(); i++)
+		{
+			variablePlace = argVector[i].find('$');
+			if (variablePlace != string::npos)
+			{
+				varString = argVector[i].substr(variablePlace + 1);//variable value
+
+				//check for shell specials first, if not found then replace with whats found in locals
+				switch (argVector[i][variablePlace + 1])
+				{
+				case '$':
+					if ((argVector[0] != "set") || (i == 2)) argVector[i] = shellPid.str();				// getpid(); getppid();?  //replaces with PID if not trying to set $ to local variables
+					else
+					{
+						argVector.erase(argVector.begin() + i);								//erase value that user is trying to set, so set will fail
+						cout << "\n Setting Shell Variables $, ?, or ! is not allowed!\n\n";
+					}
+					break;
+				case '?':
+					if ((argVector[i] != "set") || (i == 2)) argVector[i] = foregroundVal.str();			// hmm need to work on foreground stuff
+					else
+					{
+						argVector.erase(argVector.begin() + i);
+						cout << "\n Setting Shell Variables $, ?, or ! is not allowed!\n\n";
+					}
+					break;
+				case '!':
+					if ((argVector[0] != "set") || (i == 2)) argVector[i] = backgroundPid.str();			//hmmx2 need to work on background stuff
+					else
+					{
+						argVector.erase(argVector.begin() + i);
+						cout << "\n Setting Shell Variables $, ?, or ! is not allowed!\n\n";
+					}
+					break;
+				default:
+					if ((ShellCommand->localVariable.find(varString)) != (ShellCommand->localVariable.end()))		// search for variable name in locals
+					{
+						argVector[i].replace(variablePlace, string::npos, ShellCommand->localVariable[varString]);	//replace $variable in argVector with localVar value
+					}
+					else
+					{
+						cout << "\nNo Local Variable -" << varString << "- exists\n"; //couldnt find anything
+					}
+				}
+			}
+		}
+	}
+	return;
 }
 
 Command::ShellStates SimpleShell::ExecuteCommand()
@@ -118,11 +188,11 @@ void SimpleShell::HandleSIGNAL(int sig)
     }
 }
 
-/*
-    Check Piped will look for '|' as a delimiter
-    each command and all its arguments will exist in the same element - space delimited
-    returns true if it found a pipe
-*/
+-/*
+-    Check Piped will look for '|' as a delimiter
+-    each command and all its arguments will exist in the same element - space delimited
+-    returns true if it found a pipe
+-*/
 bool SimpleShell::CheckPiped()
 {
 	unsigned int pipePlace = 0;
@@ -150,4 +220,3 @@ bool SimpleShell::CheckPiped()
 
 	return isPiped;
 }
-
