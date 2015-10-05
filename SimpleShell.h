@@ -7,7 +7,7 @@
 #define History_h
 #include "History.h"
 #endif
-#include "Command.h"
+#include "Commands.h"
 
 using namespace std;
 
