@@ -28,6 +28,10 @@ void SimpleShell::ShellLoop()
 			getline(cin, unpause);
 			continue;
 		}
+		//if (ShellCommand->shellStatus == Command::Exit)
+		//{
+		//	break;
+		//}
 
 
 
@@ -140,7 +144,11 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else if (argVector[0] == "unexport") ((CommandUNEXPORT*) ShellCommand)->Execute(argVector);
    else if (argVector[0] == "environ")  ((CommandENVIRON*) ShellCommand)->Execute(argVector);
    else if (argVector[0] == "chdir")    ((CommandCHDIR*) ShellCommand)->Execute(argVector);
-   else if (argVector[0] == "exit")     ((CommandEXIT*) ShellCommand)->Execute(argVector);
+   else if (argVector[0] == "exit")
+   {
+	   ((CommandEXIT*)ShellCommand)->Execute(argVector);
+	   //return Command::Exit;
+   }
    else if (argVector[0] == "wait")     ((CommandWAIT*) ShellCommand)->Execute(argVector);
    else if (argVector[0] == "clr")      ((CommandCLR*) ShellCommand)->Execute(argVector);
    else if (argVector[0] == "dir")      ((CommandDIR*) ShellCommand)->Execute(argVector);
