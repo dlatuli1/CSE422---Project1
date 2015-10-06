@@ -89,6 +89,8 @@ int CommandENVIRON::Execute(vector<string> argVector)
 {
    cout << "Executing environ command" << endl;
    //Execute environ command
+
+   //setenv(argVector[0].c_str(),argVector[1].c_str(),1);
    return 0;
 }
 
@@ -103,13 +105,18 @@ int CommandEXIT::Execute(vector<string> argVector)
 {
    cout << "Executing exit command" << endl;
    //Execute exit command
-   return 0;
+  
+   return atoi(argVector[1].c_str());
 }
 
 int CommandWAIT::Execute(vector<string> argVector)
 {
    cout << "Executing wait command" << endl;
    //Execute wait command
+   
+   //Can't do much until children are created...
+   //Temp answer:
+   //
    return 0;
 }
 
@@ -117,6 +124,10 @@ int CommandCLR::Execute(vector<string> argVector)
 {
    cout << "Executing clr command" << endl;
    //Execute clr command
+   
+   //There's no perfect way to do this that is portable
+   //Temp answer:
+   //cout << string(100, '\n');
    return 0;
 }
 
