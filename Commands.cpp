@@ -244,5 +244,16 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
 	return 0;
 }
 
+int CommandEXTERNAL::Execute(vector<string> argVector)
+{
+   string fullArg = "";
+   for (int i = 0; i < argVector.size(); i++)
+   {
+      fullArg.append(argVector[i]);
+      if (i != argVector.size()-1)
+         fullArg.append(" ");
+   }
 
+   system(fullArg.c_str());
+}
 
