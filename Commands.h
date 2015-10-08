@@ -138,3 +138,9 @@ class CommandHISTORY : Command
 public:
    int Execute(vector<string> argVector, History* ShellCommandHistory);
 };
+
+class CommandEXTERNAL : Command
+{
+public:
+   int Execute(vector<string> argVector);
+};
