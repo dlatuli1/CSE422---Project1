@@ -255,5 +255,6 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
    }
 
    system(fullArg.c_str());
+   return 0;
 }
 
