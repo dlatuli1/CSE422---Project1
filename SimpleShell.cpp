@@ -159,6 +159,7 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else
    {
       cout << "EXTERNAL COMMAND" << endl;
+      ((CommandEXTERNAL*)ShellCommand)->Execute(argVector);
    }
 
    return Command::Go;
