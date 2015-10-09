@@ -10,7 +10,7 @@ TARGET	= sish
 
 default: sish
 
-sish: main.o Commands.o History.o SimpleShell.o
+sish: main.o Commands.o History.o SimpleShell.o SupportingFunctions.o
 	$(CC) $(FLAGS) -o $(TARGET) main.o Commands.o History.o SimpleShell.o
 
 main.o: main.cpp
@@ -25,5 +25,7 @@ History.o: History.cpp History.h
 SimpleShell.o: SimpleShell.cpp SimpleShell.h
 	$(CC) $(FLAGS) -c SimpleShell.cpp SimpleShell.h
 
+SupportingFunctions.o: SupportingFunctions.h
+	$(CC) $(FLAGS) -c SupportingFunctions.h
 clean:
 	rm -f $(TARGET) *.o *~ *.gch

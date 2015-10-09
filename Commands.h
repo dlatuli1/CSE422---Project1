@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 #ifdef WINDOWS
@@ -142,5 +145,5 @@ public:
 class CommandEXTERNAL : Command
 {
 public:
-   int Execute(vector<string> argVector);
+   static int Execute(vector<string> argVector);
 };

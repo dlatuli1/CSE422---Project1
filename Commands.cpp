@@ -1,4 +1,5 @@
 #include "Commands.h"
+#include "SupportingFunctions.h"
 
 Command::Command()
 {
@@ -244,7 +245,7 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
 	return 0;
 }
 
-int CommandEXTERNAL::Execute(vector<string> argVector)
+/*int CommandEXTERNAL::Execute(vector<string> argVector)
 {
    string fullArg = "";
    for (int i = 0; i < argVector.size(); i++)
@@ -256,5 +257,58 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
 
    system(fullArg.c_str());
    return 0;
-}
+}*/
 
+int CommandEXTERNAL::Execute(vector<string> argVector)
+{
+    const string searchPath = "/bin/";//getenv("PATH");
+    string externalCommand = searchPath + argVector[0];
+    pid_t pid;
+    int status, timeout;
+    vector<char*> vc;
+    
+    // Since the execve() function takes char*, argVector has to be modified. vc is the modified char** equivalent of argVector
+    // char *convert(const string & s) defined in SupportingFunctions.h
+    transform(argVector.begin(), argVector.end(), back_inserter(vc), convert);
+    
+    if (0 == (pid = fork())) { //Child process
+        if (execve(externalCommand.c_str(), &vc[0] , NULL) == -1) {
+            perror("child process execve failed [%m]");
+            cout << externalCommand << endl;
+            pid = getpid();
+            kill(pid, SIGKILL);
+            return -1;
+        }
+    }
+    else{ //Parent process
+        cout << "Parent process waiting..." << endl;
+        wait(&status);
+        if(status != 0){
+            cerr << "Child process end error!" << endl;
+            kill(pid, SIGKILL);
+            return -1;
+        }
+    }
+    
+/*#ifdef WAIT_FOR_COMPLETION
+    timeout = 1000;
+    while (waitpid(pid , &status , WNOHANG) == 0) {
+        if ( --timeout < 0 ) {
+            perror("timeout");
+            return -1;
+        }
+        sleep(1);
+    }
+    cout << argVector[0] << " WEXITSTATUS " <<  WEXITSTATUS(status) << " WIFEXITED" << WIFEXITED(status) << " [status " << status << "]" << endl;
+    
+    if (WIFEXITED(status) != 1 || WEXITSTATUS(status) != 0) {
+        perror("%s failed, halt system");
+        return -1;
+    }
+#endif*/
+    
+    for ( size_t i = 0 ; i < vc.size() ; i++ )
+        delete [] vc[i];
+    
+    return 0;
+}

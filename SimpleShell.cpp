@@ -197,7 +197,7 @@ void SimpleShell::HandleSIGNAL(int sig)
     }
 }
 
--/*
+/*
 -    Check Piped will look for '|' as a delimiter
 -    each command and all its arguments will exist in the same element - space delimited
 -    returns true if it found a pipe
