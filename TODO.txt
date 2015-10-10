@@ -9,7 +9,7 @@ do KILL                                           - David //Looks good
 do output redirection
 implement pipes                                - Todd
 add line to put state back in Go after PAUSE
-implement WAIT command
+implement WAIT command                        - David //Looks good
 implement help command (write man pages)
 implement debug level                          -Corey
 implement -x
