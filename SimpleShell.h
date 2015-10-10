@@ -45,6 +45,7 @@ private:
 
    // Parse Input Line
    int ParseInputLine();
+   int ParseInputLine(string repeated);
 
    // Execute Command
    Command::ShellStates ExecuteCommand();
