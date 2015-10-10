@@ -11,16 +11,23 @@ int main(int argc, char* argv[])
       switch (c)
       {
           case 'f':
-             //do file input stuff
+	  {
              i++;
+             string inputFile = argv[i];
+	     SISH->SetFileInputMode(true, inputFile);
              break;
+	  }
           case 'x':
+	  {
              //do variable substitution stuff
              break;
+	  }
           case 'd':
+	  {
              //do debug level stuff
              i++;
              break;
+	  }
           default:
              cout << "Invalid command line flag -" << c << endl;
        }
