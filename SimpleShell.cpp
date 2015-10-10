@@ -92,9 +92,29 @@ int SimpleShell::ParseInputLine()
          ShellCommand->shellStatus = Command::Exit;
       }
    }
+    while (delimiter != string::npos) //replaces tabs with spaces
+    {
+        delimiter = input.find('\t', delimiter);
+        if (delimiter != string::npos)
+        {
+            input.replace(delimiter,1," ");
+            delimiter++;
+        }
+    }
+    delimiter = 0;
+
+    while (delimiter != string::npos) //erase extra spaces
+    {
+        delimiter = input.find(' ', delimiter);
+        if((delimiter != string::npos) && (delimiter < input.size()))
+        {
+            if (input[++delimiter] == ' ') input.erase(delimiter,1);
+        }
+    }
+
+    delimiter = 0;
 
    if (ShellCommandHistory->HistorySize() >= 100) ShellCommandHistory->TrimOld(); //limit history deque size to 100
-
    ShellCommandHistory->PushNew(input);
 
    while (delimiter != string::npos)
