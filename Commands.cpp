@@ -61,6 +61,7 @@ int CommandEXPORT::Execute(vector<string> argVector)
        char *cStringArg2 = new char[argVector[2].length() + 1];
        strcpy(cStringArg1, argVector[1].c_str());
        strcpy(cStringArg2, argVector[2].c_str());
+       environment[argVector[1]] = argVector[2];
        setenv(cStringArg1, cStringArg2, true);
        delete cStringArg1;
        delete cStringArg2;
@@ -78,8 +79,9 @@ int CommandUNEXPORT::Execute(vector<string> argVector)
        // since unsetenv() takes char* type, we have to first convert the arguments into char*
        char *cStringArg = new char[argVector[1].length() + 1];
        strcpy(cStringArg, argVector[1].c_str());
-       //unsetenv(cStringArg);
+       unsetenv(cStringArg);
        delete cStringArg;
+       environment.erase(argVector[1]);
    } else {
        cout << "Usage: unexport W" << endl;
    }
@@ -88,13 +90,19 @@ int CommandUNEXPORT::Execute(vector<string> argVector)
 
 int CommandENVIRON::Execute(vector<string> argVector)
 {
-   cout << "Executing environ command" << endl;
+   cout <<  endl;
    //Execute environ command
-
+/*
     extern char **environ;
     //char *s = *environ;
     for(int i = 1; environ[i]!=NULL; i++)
     cout << environ[i] << '\n';
+    */
+    for (map<string, string>::iterator it =  environment.begin(); it != environment.end(); it++)
+    {
+        string envString = it->first + "=" + it->second;
+        cout << envString << '\n';
+    }
     return 0;
 }
 
@@ -264,21 +272,46 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
 
 int CommandEXTERNAL::Execute(vector<string> argVector)
 {
-    const string searchPath = "/bin/";//getenv("PATH");
+    //const string searchPath = "/bin/";//getenv("PATH");
     //string externalCommand = searchPath + argVector[0];
- //   string envString;
+    string pathString;
     pid_t pid;
-    int status, timeout;//, counter;
+    int status;//, timeout;//, counter;
     bool background = false;
     vector<char*> vc;
+    char workingDir_Cstr[FILENAME_MAX];
+	GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
+ //   cout << '\n' << argVector[0];
 //    char * passEviron[environment.size()+1];
-    extern char ** environ;
+//    extern char ** environ;
 
     if (argVector.back() == "!") //background command
     {
         background = true;
         argVector.pop_back();
     }
+
+    if (argVector[0].find("..") != string::npos)
+    {
+        pathString = string(workingDir_Cstr);
+        size_t parentDir = pathString.find_last_of('/',string::npos) + 1;
+        size_t comName = argVector[0].find_last_of('.',string::npos) + 1;
+        pathString.replace(parentDir,string::npos,argVector[0].substr(comName,string::npos));
+        //cout << pathString << '\n';
+    }
+    else if (argVector[0].find(".") != string::npos)
+    {
+        pathString = string(workingDir_Cstr);
+        pathString += "/";
+        size_t comName = argVector[0].find_last_of('.',string::npos) + 1;
+        pathString.append(argVector[0],comName,string::npos);
+        //cout << pathString << '\n';
+    }
+    else
+    {
+        pathString = argVector[0];
+    }
+
     // Since the execve() function takes char*, argVector has to be modified. vc is the modified char** equivalent of argVector
     // char *convert(const string & s) defined in SupportingFunctions.h
     transform(argVector.begin(), argVector.end(), back_inserter(vc), convert);
@@ -304,7 +337,7 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
         fflush(stdout);
 //        char **childEnviron = environ;
  //       if (execve(externalCommand.c_str(), &vc[0] , NULL) == -1)
-       if(execvp(argVector[0].c_str(), &vc[0]))
+       if(execvp(pathString.c_str(), &vc[0]))
         {
             perror("child process execve failed [%m]");
  //           cout << argVector[0] << endl;
