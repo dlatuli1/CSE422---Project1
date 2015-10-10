@@ -130,14 +130,17 @@ int CommandEXIT::Execute(vector<string> argVector)
 
 int CommandWAIT::Execute(vector<string> argVector)
 {
-   cout << "Executing wait command" << endl;
-   //Execute wait command
-
-   //Can't do much until children are created...
-   //Temp answer:
-   //
+    int status;
+    if (argVector.size() == 2)
+    {
+        cout << "Executing wait command" << endl;
+        pid_t pid = stoi(argVector[1]);
+        if(pid > 0) waitpid(pid,&status,0);
+        else waitpid(0,&status,0);
+    }
    return 0;
 }
+
 
 int CommandCLR::Execute(vector<string> argVector)
 {
