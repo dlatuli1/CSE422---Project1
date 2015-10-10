@@ -272,7 +272,9 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
 
    string pathString;
    pid_t pid;
+   size_t delimiter = 0;
    int status;
+   bool multiParent = false;
    bool background = false;
    vector<char*> vc;
    char workingDir_Cstr[FILENAME_MAX];
@@ -284,27 +286,39 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
       background = true;
       argVector.pop_back();
    }
-
    if (argVector[0].find("..") != string::npos)
    {
-      pathString = string(workingDir_Cstr);
-      size_t parentDir = pathString.find_last_of('/', string::npos) + 1;
-      size_t comName = argVector[0].find_last_of('.', string::npos) + 1;
-      pathString.replace(parentDir, string::npos, argVector[0].substr(comName, string::npos));
-      //cout << pathString << '\n';
+        pathString = string(workingDir_Cstr);
+        while(delimiter != string::npos)
+        {
+          delimiter = argVector[0].find("..",++delimiter);
+
+          size_t parentDir = pathString.find_last_of('/', string::npos);
+          pathString.erase(parentDir,string::npos);
+          if (multiParent)
+          {
+            size_t parentDir = pathString.find_last_of('/', string::npos);
+            pathString.erase(parentDir,string::npos);
+          }
+          size_t comName = argVector[0].find_last_of('/', string::npos);
+          pathString.append(argVector[0].substr(comName, string::npos));
+          multiParent = true;
+        }
+        delimiter = 0;
+      cout << pathString << '\n';
    }
-   else if (argVector[0].find(".") != string::npos)
-   {
-      pathString = string(workingDir_Cstr);
-      pathString += "/";
-      size_t comName = argVector[0].find_last_of('.', string::npos) + 1;
-      pathString.append(argVector[0], comName, string::npos);
-      //cout << pathString << '\n';
-   }
-   else
-   {
-      pathString = argVector[0];
-   }
+       else if (argVector[0].find(".") != string::npos)
+       {
+          pathString = string(workingDir_Cstr);
+          //pathString += "/";
+          size_t comName = argVector[0].find_last_of('.', string::npos) + 1;
+          pathString.append(argVector[0], comName, string::npos);
+          cout << pathString << '\n';
+       }
+       else
+       {
+          pathString = argVector[0];
+       }
 
    // Since the execve() function takes char*, argVector has to be modified. vc is the modified char** equivalent of argVector
    // char *convert(const string & s) defined in SupportingFunctions.h
