@@ -14,7 +14,7 @@ implement help command (write man pages)
 implement debug level                          -Corey
 implement -x
 finish -f (with arguments) (and search paths)	-Corey
-do . and .. (with slash)                      -David  
+do . and .. (with slash)                      -David  //looks good
 stdin/stdout redirection
 parse out muliple spaces		               	-David    //looks good
 implement # for comments
