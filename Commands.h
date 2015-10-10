@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -41,7 +42,7 @@ public:
    ~Command();
 
    int Execute();
-   map<string, string> localVariable;
+   static map<string, string> localVariable;
    map<string, string> environment;
    enum ShellStates
    {
@@ -132,6 +133,13 @@ public:
    int Execute(vector<string> argVector);
 };
 
+/*
+class CommandREPEAT : Command
+{
+public:
+    int Execute(vector<string> argVector);
+};*/
+
 class CommandPAUSE : Command
 {
 public:
@@ -142,6 +150,11 @@ class CommandHISTORY : Command
 {
 public:
    int Execute(vector<string> argVector, History* ShellCommandHistory);
+};
+class CommandKILL : Command
+{
+public:
+    int Execute(vector<string> argVector);
 };
 
 class CommandEXTERNAL : Command
