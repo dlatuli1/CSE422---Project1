@@ -42,6 +42,7 @@ public:
 
    int Execute();
    map<string, string> localVariable;
+   map<string, string> environment;
    enum ShellStates
    {
 	   Go,
@@ -146,5 +147,5 @@ public:
 class CommandEXTERNAL : Command
 {
 public:
-   static int Execute(vector<string> argVector);
+   int Execute(vector<string> argVector);
 };
