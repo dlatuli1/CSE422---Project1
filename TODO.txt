@@ -8,7 +8,7 @@ do REPEAT                                         - David //should be done - che
 do KILL                                           - David //Looks good
 do output redirection
 implement pipes                                - Todd
-add line to put state back in Go after PAUSE
+add line to put state back in Go after PAUSE  - David //Looks good
 implement WAIT command                        - David //Looks good
 implement help command (write man pages)
 implement debug level                          -Corey
