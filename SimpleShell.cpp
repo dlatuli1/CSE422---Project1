@@ -111,6 +111,26 @@ int SimpleShell::ParseInputLine()
    return 0;
 }
 
+int SimpleShell::ParseInputLine(std::string repeated)
+{
+    argVector.clear();
+   size_t delimiter = 0;
+
+
+   while (delimiter != string::npos)
+   {
+      delimiter = repeated.find(' ');
+      if (delimiter != string::npos)
+      {
+         argVector.push_back(repeated.substr(0, delimiter));
+         repeated.erase(0, delimiter + 1);
+      }
+      else argVector.push_back(repeated.substr(0, string::npos));
+   }
+   VariableSub();
+   return 0;
+}
+
 // subs in variable values before commands are exectuted - Called by ParseInputLine()
 // will erase vector value if found that user is trying to set a special variable to something else
 // need to work on ! and ? - values from foreground command and background command.
@@ -126,8 +146,6 @@ void SimpleShell::VariableSub()
    ostringstream backgroundPid;
 
    shellPid << getppid(); //should it be getpid??
-   if (ForegroudProcesses.size()) foregroundVal << ForegroudProcesses[ForegroudProcesses.size() - 1]; // does nothing now. look into foreground process history stuff
-   if (BackgroudProcesses.size())backgroundPid << BackgroudProcesses[BackgroudProcesses.size() - 1];  // does nothing now, look into background process history stuff
 
    if (argVector[0] != "echo") //  ignore this for echo
    {
@@ -150,7 +168,7 @@ void SimpleShell::VariableSub()
                }
                break;
             case '?':
-               if ((argVector[i] != "set") || (i == 2)) argVector[i] = ShellCommand->localVariable["?"];			// hmm need to work on foreground stuff
+               if ((argVector[i] != "set") || (i == 2)) argVector[i] = Command::localVariable["?"];			// hmm need to work on foreground stuff
                else
                {
                   argVector.erase(argVector.begin() + i);
@@ -158,7 +176,7 @@ void SimpleShell::VariableSub()
                }
                break;
             case '!':
-               if ((argVector[0] != "set") || (i == 2)) argVector[i] = ShellCommand->localVariable["!"];			//hmmx2 need to work on background stuff
+               if ((argVector[0] != "set") || (i == 2)) argVector[i] = Command::localVariable["!"];			//hmmx2 need to work on background stuff
                else
                {
                   argVector.erase(argVector.begin() + i);
@@ -166,9 +184,9 @@ void SimpleShell::VariableSub()
                }
                break;
             default:
-               if ((ShellCommand->localVariable.find(varString)) != (ShellCommand->localVariable.end()))		// search for variable name in locals
+               if ((ShellCommand->localVariable.find(varString)) != (Command::localVariable.end()))		// search for variable name in locals
                {
-                  argVector[i].replace(variablePlace, string::npos, ShellCommand->localVariable[varString]);	//replace $variable in argVector with localVar value
+                  argVector[i].replace(variablePlace, string::npos, Command::localVariable[varString]);	//replace $variable in argVector with localVar value
                }
                else
                {
@@ -191,6 +209,7 @@ void SimpleShell::InitEnvironment()
    ShellCommand->environment["shell"] = toMap;
    ShellCommand->environment["PATH"] = pathMap;
    ShellCommand->environment["parent"] = toMap;
+   Command::localVariable["foregroundPIDval"] = "0";
    setenv("parent", toMap.c_str(), 1);
 
    return;
@@ -198,6 +217,7 @@ void SimpleShell::InitEnvironment()
 
 Command::ShellStates SimpleShell::ExecuteCommand()
 {
+   unsigned int toInt=0;
    if (argVector[0] == "show")     ((CommandSHOW*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "set")      ((CommandSET*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "unset")    ((CommandUNSET*)ShellCommand)->Execute(argVector);
@@ -217,6 +237,40 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else if (argVector[0] == "help")     ((CommandHELP*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "pause")    return ((CommandPAUSE*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "history")  ((CommandHISTORY*)ShellCommand)->Execute(argVector, ShellCommandHistory);
+   else if (argVector[0] == "repeat")
+   {
+        fflush(stdin);
+        if(argVector.size() == 1)
+        {
+            cout << '\n' << ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2) << '\n';
+            ParseInputLine(ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2));
+            if (argVector[0] == "repeat")
+            {
+                cout << '\n' << "Please Dont Repeat a Repeat Command, way too recursive for me" << '\n';
+                return Command::Go;
+            }
+            CheckPiped();
+            ShellCommand->shellStatus = ExecuteCommand();
+
+        }
+        else if(argVector.size() == 2)
+        {
+            toInt = stoi(argVector[1]);
+            cout << '\n' << ShellCommandHistory->Get(toInt - 1) << '\n';
+            if((toInt > 0)&&(toInt <= ShellCommandHistory->HistorySize()))
+            {
+                ParseInputLine(ShellCommandHistory->Get(toInt - 1));
+                if (argVector[0] == "repeat")
+                {
+                    cout << '\n' << "Please Dont Repeat a Repeat Command, way too recursive for me" << '\n';
+                    return Command::Go;
+                }
+                CheckPiped();
+                ShellCommand->shellStatus = ExecuteCommand();
+            }
+        }
+   }
+   else if (argVector[0] == "kill")     ((CommandKILL*)ShellCommand)->Execute(argVector);
    else
    {
       cout << "EXTERNAL COMMAND" << endl;
@@ -225,11 +279,6 @@ Command::ShellStates SimpleShell::ExecuteCommand()
 
    return Command::Go;
 }
-
-
-
-std::vector<pid_t> SimpleShell::ForegroudProcesses;
-std::vector<pid_t> SimpleShell::BackgroudProcesses;
 
 void SimpleShell::InitSigHandler()
 {
@@ -247,15 +296,15 @@ void SimpleShell::InitSigHandler()
 }
 void SimpleShell::HandleSIGNAL(int sig)
 {
-   //std::cout << "\n\n Signal Caught\n\nsish>>";
+//   std::cout << "\n\n Signal Caught\n\n";
+//   std::cout << "\nsish >>";
    fflush(stdout);
-   
+   int status;
+   int pid = stoi(Command::localVariable["foregroundPIDval"]);
    if (sig == SIGINT || SIGQUIT || SIGCONT || SIGSTOP) // only need to pass these signals to foreground processes
    {
-      for (unsigned int i = 0; i < ForegroudProcesses.size(); i++)
-      {
-         kill(ForegroudProcesses[i], sig);//pass on the caught signal to all foreground
-      }
+        if(pid>0) kill(pid, sig);//pass on the caught signal to all foreground
+        waitpid(pid,&status,0);
    }
 }
 
@@ -291,3 +340,4 @@ bool SimpleShell::CheckPiped()
 
    return isPiped;
 }
+
