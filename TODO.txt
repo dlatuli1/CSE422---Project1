@@ -1,0 +1,20 @@
+clear warnings
+fix bug on exit                   - Corey
+*if time explore better CLR       - Corey
+*if time explore better SHOW      - David
+do CHDIR
+double check SIGNALS work         - David
+do REPEAT                                         - David
+do output redirection
+implement pipes                                - Todd
+add line to put state back in Go after PAUSE
+implement WAIT command
+implement help command (write man pages)
+implement debug level                          -Corey
+implement -x
+finish -f (with arguments) (and search paths)	-Corey
+do . and .. (with slash)                      -David
+stdin/stdout redirection
+parse out muliple spaces		               	-David
+implement # for comments
+need to ignore blank commands
