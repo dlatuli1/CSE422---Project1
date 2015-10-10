@@ -90,9 +90,11 @@ int CommandENVIRON::Execute(vector<string> argVector)
 {
    cout << "Executing environ command" << endl;
    //Execute environ command
-
-   //setenv(argVector[0].c_str(),argVector[1].c_str(),1);
-   return 0;
+    extern char **environ;
+    //char *s = *environ;
+    for(int i = 1; environ[i]!=NULL; i++)
+    cout << environ[i] << '\n';
+    return 0;
 }
 
 int CommandCHDIR::Execute(vector<string> argVector)
