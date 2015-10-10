@@ -60,8 +60,7 @@ void SimpleShell::SetFileInputMode(bool fim, string input)
 {
 	this->fileInputMode = fim;
 	if(debugLevel >= 1) cout << "Opening file " << input << endl;
-	//inputFile.open(input.c_str());
-	inputFile.open("./TestInput.txt");
+	inputFile.open(input.c_str());
 	if(!inputFile.is_open())
 	{
 		cout << "Error opening input file, reverting to stdin" << endl;
