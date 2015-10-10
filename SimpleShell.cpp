@@ -249,7 +249,7 @@ void SimpleShell::HandleSIGNAL(int sig)
 {
    //std::cout << "\n\n Signal Caught\n\nsish>>";
    fflush(stdout);
-   std::cout << "\nsish>>";
+   
    if (sig == SIGINT || SIGQUIT || SIGCONT || SIGSTOP) // only need to pass these signals to foreground processes
    {
       for (unsigned int i = 0; i < ForegroudProcesses.size(); i++)
