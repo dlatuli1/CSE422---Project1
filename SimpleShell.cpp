@@ -25,7 +25,94 @@ void SimpleShell::ShellLoop()
    {
       argVector.clear();
       ParseInputLine();
-      CheckPiped();
+       if (CheckPiped())
+       {
+           int status;
+           int p[2];
+           int pid1, pid2;
+           
+           if(pipe(p) == -1){
+               cerr << "Pipe call error" << endl;
+               continue;
+           }
+           
+           //For child one
+           if((pid1 = fork())== -1){
+               cerr << "Error fork child 1" << endl;
+               continue;
+           }
+           else if(pid1 == 0){
+               
+               cout << "Child 1 excuting..." << endl;
+               
+               //construct argment list for executable
+               char** argList1 = new char* [pipedVector.size()];
+               for(int i = 0; i < pipedVector[0].length(); i++){
+                   argList1[i] = strdup(pipedVector[0].c_str());
+               }
+               argList1[pipedVector.size()] = (char*)0;
+               
+               if(close(p[0]) == -1){
+                   cerr << "Error closing read end" << endl;
+                   pid1 = getpid();
+                   kill(pid1, SIGKILL);
+                   continue;
+               }
+               dup2(p[1], STDOUT_FILENO);
+               execvp((pipedVector[0]).c_str(), argList1);
+               cerr << "Execv file1 error!" << endl;
+               pid1 = getpid();
+               kill(pid1, SIGKILL);
+               continue;
+           }
+           
+           pid_t w1 = waitpid(pid1, &status, WUNTRACED | WCONTINUED);
+           cout << "Wait process 1.." << endl;
+           
+           //For child two
+           pid2 = fork();
+           if(pid2 == -1){
+               cerr << "Error fork child 2" << endl;
+               pid2 = getpid();
+               kill(pid2, SIGKILL);
+               continue;
+           }
+           else if(pid2 == 0){
+               cout << "Child 2 excuting..." << endl;
+               
+               //construct argment list for executable
+               char** argList2 = new char* [pipedVector[1].length()];
+               for(int i = 0; i < pipedVector[1].length() - 1; i++){
+                   argList2[i] = strdup((char *)pipedVector[1][i]);
+               }
+               argList2[pipedVector[1].length() - 1] = (char*)0;
+               
+               if(close(p[1]) == -1){
+                   cerr << "Error closing write end" << endl;
+                   pid2 = getpid();
+                   kill(pid2, SIGKILL);
+                   continue;
+               }
+               if(dup2(p[0], STDIN_FILENO) == -1){
+                   cerr << "STDIN fail!" << endl;
+                   pid2 = getpid();
+                   kill(pid2, SIGKILL);
+                   continue;
+               }
+               execv(pipedVector[1].c_str(), argList2);
+               std::cerr << "Execl executable 2 failed!" << endl;
+               pid2 = getpid();
+               kill(pid2, SIGKILL);
+               continue;
+           }
+           
+           //Go back to parent process
+           cout << "Child process waiting..." << endl;
+           close(p[0]);
+           close(p[1]);
+           pid_t w2 = waitpid(pid2, &status, WUNTRACED | WCONTINUED);
+           cout << "Go back to parent" << endl;
+       }
 
       if (ShellCommand->shellStatus == Command::Go)
       {
