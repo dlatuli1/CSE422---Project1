@@ -9,6 +9,8 @@ Command::~Command()
 {
 }
 
+map<string,string> Command::localVariable;
+
 int Command::Execute()
 {
    return 0;
@@ -31,7 +33,7 @@ int CommandSET::Execute(vector<string> argVector)
    //Execute set command
    if (argVector.size() == 3)
    {
-      localVariable[argVector[1]] = argVector[2];
+      Command::localVariable[argVector[1]] = argVector[2];
    }
    else
    {
@@ -46,7 +48,7 @@ int CommandUNSET::Execute(vector<string> argVector)
    //Execute unset command
    if (argVector.size() == 2)
    {
-      localVariable.erase(argVector[1]);
+      Command::localVariable.erase(argVector[1]);
    }
    else
    {
@@ -102,12 +104,7 @@ int CommandENVIRON::Execute(vector<string> argVector)
 {
    cout << endl;
    //Execute environ command
-   /*
-   extern char **environ;
-   //char *s = *environ;
-   for(int i = 1; environ[i]!=NULL; i++)
-   cout << environ[i] << '\n';
-   */
+
    for (map<string, string>::iterator it = environment.begin(); it != environment.end(); it++)
    {
       string envString = it->first + "=" + it->second;
@@ -208,7 +205,13 @@ int CommandHELP::Execute(vector<string> argVector)
    //Execute help command
    return 0;
 }
+/*
+int CommandREPEAT::Execute(vector<string> argVector)
+{
 
+
+}
+*/
 Command::ShellStates CommandPAUSE::Execute(vector<string> argVector)
 {
    cout << "Executing pause command" << endl;
@@ -243,20 +246,38 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
    return 0;
 }
 
+int CommandKILL::Execute(vector<string> argVector)
+{
+    int pid =0;
+    int sig =0;
+    int status;
+    if(argVector.size() == 2)
+    {
+        pid = stoi(argVector[1]);
+        kill(pid,SIGTERM);
+        waitpid(pid,&status, 0);
+    }
+    else if(argVector.size()==3)
+    {
+        pid = stoi(argVector[2]);
+        sig = abs (stoi(argVector[1]));
+        kill(pid,sig);
+        waitpid(pid,&status, 0);
+    }
+return 0;
+}
+
 int CommandEXTERNAL::Execute(vector<string> argVector)
 {
-   //const string searchPath = "/bin/";//getenv("PATH");
-   //string externalCommand = searchPath + argVector[0];
+
    string pathString;
    pid_t pid;
-   int status;//, timeout;//, counter;
+   int status;
    bool background = false;
    vector<char*> vc;
    char workingDir_Cstr[FILENAME_MAX];
    GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
-   //   cout << '\n' << argVector[0];
-   //    char * passEviron[environment.size()+1];
-   //    extern char ** environ;
+
 
    if (argVector.back() == "!") //background command
    {
@@ -289,74 +310,36 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
    // char *convert(const string & s) defined in SupportingFunctions.h
    transform(argVector.begin(), argVector.end(), back_inserter(vc), convert);
    vc.push_back(NULL);
-   /*
-   for (vector<char*>::iterator it = vc.begin(); it != vc.end(); it++)
-   {
-   cout << '\n' << *it << ' ';
-   }*/
-   //    counter = 0;
-   /*    for (map<string, string>::iterator it =  environment.begin(); it != environment.end(); it++)
-   {
-   envString = it->first + "=" + it->second;
-   char * copystr = new char [envString.length() + 1];
-   strcpy(copystr, envString.c_str());
-   passEviron[counter++] = copystr;
-   cout << "\n\n" << passEviron[counter-1] << "\n\n";
-   delete[] copystr;
-   }*/
 
    if ((pid = fork()) == 0) {
       //Child process
       fflush(stdout);
-      //        char **childEnviron = environ;
-      //       if (execve(externalCommand.c_str(), &vc[0] , NULL) == -1)
+
       if (execvp(pathString.c_str(), &vc[0]))
       {
          perror("child process execve failed [%m]");
-         //           cout << argVector[0] << endl;
-         //           environ = childEnviron;
          exit(1);
       }
    }
    else{ //Parent process
       // fflush(stdout);
       cout << "Parent process waiting..." << endl;
-      //       cout << "\nparent Looking at:" << pid << '\n';
       if (!background)
       {
+         Command::localVariable["foregroundPIDval"] = to_string(pid);
          waitpid(pid, &status, 0);
-         localVariable["?"] = to_string(status);
+         Command::localVariable["?"] = to_string(status);
          if (status != 0){
             cerr << "Child process end error!" << endl;
             kill(pid, SIGKILL);
-            //return -1;
          }
       }
       else
       {
-         //           cout << "setting var\n";
-         localVariable["!"] = to_string(pid);
-         //           cout << localVariable["!"];
+         Command::localVariable["!"] = to_string(pid);
       }
-      //       kill(pid, SIGTERM);
    }
 
-   /*#ifdef WAIT_FOR_COMPLETION
-   timeout = 1000;
-   while (waitpid(pid , &status , WNOHANG) == 0) {
-   if ( --timeout < 0 ) {
-   perror("timeout");
-   return -1;
-   }
-   sleep(1);
-   }
-   cout << argVector[0] << " WEXITSTATUS " <<  WEXITSTATUS(status) << " WIFEXITED" << WIFEXITED(status) << " [status " << status << "]" << endl;
-
-   if (WIFEXITED(status) != 1 || WEXITSTATUS(status) != 0) {
-   perror("%s failed, halt system");
-   return -1;
-   }
-   #endif*/
 
    for (size_t i = 0; i < vc.size(); i++)
       delete[] vc[i];
