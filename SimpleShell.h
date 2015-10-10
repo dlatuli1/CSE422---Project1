@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <signal.h>
+#include <fstream>
 #ifndef History_h
 #define History_h
 #include "History.h"
@@ -26,6 +27,10 @@ public:
 
    // Main Loop
 	void ShellLoop();
+
+	void SetFileInputMode(bool fim, string input);
+	void SetDebugLevel(int dl);
+	void SetVariableSubstitution(bool vs);
 
 	void InitSigHandler();        //Inits the sigaction structs
 	void InitEnvironment();
@@ -54,6 +59,12 @@ private:
     static vector<pid_t> BackgroudProcesses;
 	History* ShellCommandHistory;
 	Command* ShellCommand;
+	
+	bool fileInputMode;
+	ifstream inputFile;
+
+        int debugLevel;
+	bool variableSubstitution;
 };
 
 class ShellControl
