@@ -12,11 +12,11 @@ SimpleShell::~SimpleShell()
 
 void SimpleShell::ShellLoop()
 {
+        InitSigHandler();
+        InitEnvironment();
    for (;;)
    {
 		argVector.clear();
-        InitSigHandler();
-
     	ParseInputLine();
 		CheckPiped();
 
@@ -104,7 +104,7 @@ void SimpleShell::VariableSub()
 					}
 					break;
 				case '?':
-					if ((argVector[i] != "set") || (i == 2)) argVector[i] = foregroundVal.str();			// hmm need to work on foreground stuff
+					if ((argVector[i] != "set") || (i == 2)) argVector[i] = ShellCommand->localVariable["?"];			// hmm need to work on foreground stuff
 					else
 					{
 						argVector.erase(argVector.begin() + i);
@@ -112,7 +112,7 @@ void SimpleShell::VariableSub()
 					}
 					break;
 				case '!':
-					if ((argVector[0] != "set") || (i == 2)) argVector[i] = backgroundPid.str();			//hmmx2 need to work on background stuff
+					if ((argVector[0] != "set") || (i == 2)) argVector[i] = ShellCommand->localVariable["!"];			//hmmx2 need to work on background stuff
 					else
 					{
 						argVector.erase(argVector.begin() + i);
@@ -133,6 +133,22 @@ void SimpleShell::VariableSub()
 		}
 	}
 	return;
+}
+
+void SimpleShell::InitEnvironment()
+{
+    char * homeDir = getenv("PWD");
+    char * pathEnv = getenv("PATH");
+    string toMap(homeDir);
+    string pathMap(pathEnv);
+    toMap += "/sish";
+    ShellCommand->environment["shell"] = toMap;
+    ShellCommand->environment["PATH"] = pathMap;
+    ShellCommand->environment["parent"] = toMap;
+    setenv("parent",toMap.c_str(), 1);
+
+
+    return;
 }
 
 Command::ShellStates SimpleShell::ExecuteCommand()
@@ -186,8 +202,9 @@ void SimpleShell::InitSigHandler()
 }
 void SimpleShell::HandleSIGNAL(int sig)
 {
-    std::cout << "\n\n Signal Caught\n\nsish>>";
+    //std::cout << "\n\n Signal Caught\n\nsish>>";
     fflush(stdout);
+    std::cout << "\nsish>>";
     if(sig == SIGINT||SIGQUIT||SIGCONT||SIGSTOP) // only need to pass these signals to foreground processes
     {
         for(unsigned int i = 0;i < ForegroudProcesses.size();i++)
