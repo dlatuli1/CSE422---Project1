@@ -4,10 +4,17 @@ SimpleShell::SimpleShell()
 {
    ShellCommandHistory = new History();
    ShellCommand = new Command();
+
+	fileInputMode = false;
+	debugLevel = 0;
+	variableSubstitution = false;
+
+	ShellCommand->shellStatus == Command::Go;
 }
 
 SimpleShell::~SimpleShell()
 {
+	inputFile.close();
 }
 
 void SimpleShell::ShellLoop()
@@ -20,7 +27,17 @@ void SimpleShell::ShellLoop()
     	ParseInputLine();
 		CheckPiped();
 
-		ShellCommand->shellStatus = ExecuteCommand();
+		if (ShellCommand->shellStatus == Command::Go)
+		{
+			ShellCommand->shellStatus = ExecuteCommand();
+		}
+
+		if(debugLevel >= 1)
+		{
+			char temp;
+			cout << "Press <ENTER> to continue...";
+			temp = getchar();
+		}
 
 		if (ShellCommand->shellStatus == Command::Pause)
 		{
@@ -28,10 +45,10 @@ void SimpleShell::ShellLoop()
 			getline(cin, unpause);
 			continue;
 		}
-		//if (ShellCommand->shellStatus == Command::Exit)
-		//{
-		//	break;
-		//}
+		else if (ShellCommand->shellStatus == Command::Exit)
+		{
+			break;
+		}
 
 
 
@@ -39,13 +56,47 @@ void SimpleShell::ShellLoop()
    }
 }
 
+void SimpleShell::SetFileInputMode(bool fim, string input)
+{
+	this->fileInputMode = fim;
+	if(debugLevel >= 1) cout << "Opening file " << input << endl;
+	//inputFile.open(input.c_str());
+	inputFile.open("./TestInput.txt");
+	if(!inputFile.is_open())
+	{
+		cout << "Error opening input file, reverting to stdin" << endl;
+		fileInputMode = false;
+	}
+}
+
 int SimpleShell::ParseInputLine()
 {
 	string input = "";
 	size_t delimiter = 0;
 
-	cout << "sish >> ";
-	getline(cin, input);
+	if(!fileInputMode)
+	{
+		cout << "sish >> ";
+		getline(cin, input);
+	}
+	else
+	{
+		char fileInput[1024];
+		bool readSuccess;
+		do
+		{
+			if(debugLevel >= 1) cout << "Trying to read line" << endl;
+			readSuccess = inputFile.getline(fileInput, 1024);
+			if(debugLevel >= 1) cout << "Read line \"" << fileInput << "\"" << endl;
+		}while(!strcmp(fileInput,"") && readSuccess);
+		
+		input = fileInput;
+		if (inputFile.eof())
+		{
+			if(debugLevel >= 1) cout << "Reached end of file" << endl;
+			ShellCommand->shellStatus = Command::Exit;
+		}
+	}
 
 	if (ShellCommandHistory->HistorySize() >= 100) ShellCommandHistory->TrimOld(); //limit history deque size to 100
 
@@ -163,7 +214,7 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else if (argVector[0] == "exit")
    {
 	   ((CommandEXIT*)ShellCommand)->Execute(argVector);
-	   //return Command::Exit;
+	   return Command::Exit;
    }
    else if (argVector[0] == "wait")     ((CommandWAIT*) ShellCommand)->Execute(argVector);
    else if (argVector[0] == "clr")      ((CommandCLR*) ShellCommand)->Execute(argVector);
