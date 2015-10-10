@@ -28,6 +28,7 @@ public:
 	void ShellLoop();
 
 	void InitSigHandler();        //Inits the sigaction structs
+	void InitEnvironment();
 	static void HandleSIGNAL(int sig);    //Handles the SIGINT signal
 	void VariableSub();
 	bool CheckPiped();
