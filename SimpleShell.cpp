@@ -130,6 +130,7 @@ void SimpleShell::ShellLoop()
       {
          string unpause;
          getline(cin, unpause);
+         ShellCommand->shellStatus == Command::Go;
          continue;
       }
       else if (ShellCommand->shellStatus == Command::Exit)
