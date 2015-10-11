@@ -22,13 +22,13 @@ Table of Contents
 		- Kill
 
 	+ Externals
-		- Pipes/Forks/ IO Redirection
+		- Pipes/Forks/IO Redirection
 		- Background (!)
 		- Will Execute anything in PATH variable
 
 	+ Signals
 		- Ignored 
-		- Dispositioned
+		- Redirected
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 Name 
