@@ -6,10 +6,11 @@ implement help command (write man pages)
 implement -x
 finish -f (with arguments) (and search paths)	    - Corey
 stdin/stdout redirection
-need to ignore blank commands
+
 *if time explore better CLR                       - Corey
 *if time explore better SHOW                      - David
 
+need to ignore blank commands                     - Corey
 implement debug level                             - Corey //looks good
 fix bug on exit                                   - Corey // seg fault only when exit is first command. if time fix, otherwise ship it
 double check SIGNALS work                         - David //looks good
