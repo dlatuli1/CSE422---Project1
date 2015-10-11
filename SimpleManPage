@@ -162,6 +162,12 @@ Usage:
 Options
 
 	chdir takes 1 argument, which will be the new directory
+	".." moves the directory up one level-to the parent
+	"./file" moves the further down one level-to file
+	an absolute path will change the dir to that path
+	
+	User must enter arguments with these exact commands only, or the directory will be corrupted and 
+	  will need to be reset with a chdir to a correct absolute path
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --------------------------------------------------------------------------------------------------------------------------------------------
 
