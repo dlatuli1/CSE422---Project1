@@ -1,6 +1,4 @@
 clear warnings
-*if time explore better CLR                       - Corey
-*if time explore better SHOW                      - David
 do CHDIR
 do output redirection
 implement pipes                                   - Todd
@@ -10,6 +8,8 @@ implement -x
 finish -f (with arguments) (and search paths)	    - Corey
 stdin/stdout redirection
 need to ignore blank commands
+*if time explore better CLR                       - Corey
+*if time explore better SHOW                      - David
 
 
 fix bug on exit                                   - Corey // seg fault only when exit is first command. if time fix, otherwise ship it
