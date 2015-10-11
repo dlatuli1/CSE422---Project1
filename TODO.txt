@@ -2,7 +2,6 @@ clear warnings
 do CHDIR
 do output redirection
 implement pipes                                   - Todd
-implement help command (write man pages)
 implement -x
 stdin/stdout redirection
 
@@ -21,3 +20,4 @@ implement WAIT command                            - David //Looks good
 do . and .. (with slash)                          - David  //looks good
 parse out muliple spaces		               	      - David  //looks good
 implement # for comments                          - David  //looks good
+implement help command (write man pages)          - David //looks good
