@@ -31,7 +31,7 @@ public:
    void SetFileInputMode(bool fim, string input);
    void SetFromCommandLine(vector<string> tempVector);
    void SetDebugLevel(int dl);
-   void SetVariableSubstitution(bool vs);
+   void SetVariableSubstitution();
 
    void InitSigHandler();        //Inits the sigaction structs
    void InitEnvironment();
@@ -61,6 +61,8 @@ private:
    static vector<pid_t> BackgroudProcesses;
    History* ShellCommandHistory;
    Command* ShellCommand;
+
+   bool hasLocal;
 
    bool fileInputMode;
    ifstream inputFile;
