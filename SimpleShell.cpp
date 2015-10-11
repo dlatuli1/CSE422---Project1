@@ -9,12 +9,15 @@ SimpleShell::SimpleShell()
    debugLevel = 0;
    variableSubstitution = false;
 
-   ShellCommand->shellStatus == Command::Go;
+   ShellCommand->shellStatus = Command::Go;
 }
 
 SimpleShell::~SimpleShell()
 {
-   inputFile.close();
+   if (fileInputMode)
+   {
+      inputFile.close();
+   }
 }
 
 void SimpleShell::ShellLoop()
@@ -130,7 +133,7 @@ void SimpleShell::ShellLoop()
       {
          string unpause;
          getline(cin, unpause);
-         ShellCommand->shellStatus == Command::Go;
+         ShellCommand->shellStatus = Command::Go;
          continue;
       }
       else if (ShellCommand->shellStatus == Command::Exit)
@@ -369,7 +372,7 @@ Command::ShellStates SimpleShell::ExecuteCommand()
         }
         else if(argVector.size() == 2)
         {
-            toInt = stoi(argVector[1]);
+            toInt = atoi(argVector[1].c_str());
             cout << '\n' << ShellCommandHistory->Get(toInt - 1) << '\n';
             if((toInt > 0)&&(toInt <= ShellCommandHistory->HistorySize()))
             {
@@ -414,7 +417,7 @@ void SimpleShell::HandleSIGNAL(int sig)
 //   std::cout << "\nsish >>";
    fflush(stdout);
    int status;
-   int pid = stoi(Command::localVariable["foregroundPIDval"]);
+   int pid = atoi(Command::localVariable["foregroundPIDval"].c_str());
    if (sig == SIGINT || SIGQUIT || SIGCONT || SIGSTOP) // only need to pass these signals to foreground processes
    {
         if(pid>0) kill(pid, sig);//pass on the caught signal to all foreground
