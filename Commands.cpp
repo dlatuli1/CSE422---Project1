@@ -134,7 +134,7 @@ int CommandWAIT::Execute(vector<string> argVector)
     if (argVector.size() == 2)
     {
         cout << "Executing wait command" << endl;
-        pid_t pid = stoi(argVector[1]);
+        pid_t pid = atoi(argVector[1].c_str());
         if(pid > 0) waitpid(pid,&status,0);
         else waitpid(0,&status,0);
     }
@@ -149,7 +149,7 @@ int CommandCLR::Execute(vector<string> argVector)
 
    //There's no perfect way to do this that is portable
    //Temp answer:
-   //cout << string(100, '\n');
+   cout << string(100, '\n');
    return 0;
 }
 
@@ -256,14 +256,14 @@ int CommandKILL::Execute(vector<string> argVector)
     int status;
     if(argVector.size() == 2)
     {
-        pid = stoi(argVector[1]);
+        pid = atoi(argVector[1].c_str());
         kill(pid,SIGTERM);
         waitpid(pid,&status, 0);
     }
     else if(argVector.size()==3)
     {
-        pid = stoi(argVector[2]);
-        sig = abs (stoi(argVector[1]));
+        pid = atoi(argVector[2].c_str());
+        sig = abs (atoi(argVector[1].c_str()));
         kill(pid,sig);
         waitpid(pid,&status, 0);
     }
