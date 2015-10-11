@@ -110,7 +110,25 @@ int CommandENVIRON::Execute(vector<string> argVector)
 
 int CommandCHDIR::Execute(vector<string> argVector)
 {
-   //Execute chdir command
+     if(argVector.size() == 2)
+    {
+        string pathString = environment["CWD"];
+        if (argVector[1].find("..") != string::npos)
+        {
+            size_t parentDir = pathString.find_last_of('/', string::npos);
+            pathString.erase(parentDir,string::npos);
+        }
+        else if (argVector[1].find(".") != string::npos)
+        {
+
+            pathString = pathString + argVector[1].substr(argVector[1].find_last_of("/"));
+        }
+        else
+        {
+            pathString = argVector[1];
+        }
+        environment["CWD"] = pathString;
+    }
    return 0;
 }
 
@@ -146,11 +164,13 @@ int CommandCLR::Execute(vector<string> argVector)
 
 int CommandDIR::Execute(vector<string> argVector)
 {
+   cout << "Executing dir command" << endl;
    //Execute dir command
-   char workingDir_Cstr[FILENAME_MAX];
+   //char workingDir_Cstr[FILENAME_MAX];
    vector<string> dirContents;
-   GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
-   string workingDir(workingDir_Cstr);
+   //GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
+   //string workingDir(workingDir_Cstr);
+   string workingDir = environment["CWD"];
 
    cout << workingDir << '\n';
 
