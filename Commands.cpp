@@ -31,7 +31,7 @@ int CommandSET::Execute(vector<string> argVector)
    //Execute set command
    if (argVector.size() == 3)
    {
-      Command::localVariable[argVector[1]] = argVector[2];
+      Command::localVariable[argVector[1]] = argVector[2]; // push to shell var map
    }
    else
    {
@@ -45,7 +45,7 @@ int CommandUNSET::Execute(vector<string> argVector)
    //Execute unset command
    if (argVector.size() == 2)
    {
-      Command::localVariable.erase(argVector[1]);
+      Command::localVariable.erase(argVector[1]); //remove from shell var map
    }
    else
    {
@@ -62,10 +62,10 @@ int CommandEXPORT::Execute(vector<string> argVector)
       // since setenv() takes char* type, we have to first convert the arguments into char*
       char *cStringArg1 = new char[argVector[1].length() + 1];
       char *cStringArg2 = new char[argVector[2].length() + 1];
-      strcpy(cStringArg1, argVector[1].c_str());
-      strcpy(cStringArg2, argVector[2].c_str());
-      environment[argVector[1]] = argVector[2];
-      setenv(cStringArg1, cStringArg2, true);
+      strcpy(cStringArg1, argVector[1].c_str()); //variable name
+      strcpy(cStringArg2, argVector[2].c_str()); //variable value
+      environment[argVector[1]] = argVector[2]; //push onto shell env map
+      setenv(cStringArg1, cStringArg2, true); //push to env
       delete cStringArg1;
       delete cStringArg2;
    }
@@ -86,7 +86,7 @@ int CommandUNEXPORT::Execute(vector<string> argVector)
       strcpy(cStringArg, argVector[1].c_str());
       unsetenv(cStringArg);
       delete cStringArg;
-      environment.erase(argVector[1]);
+      environment.erase(argVector[1]); //remove it from shell environment map as well
    }
    else
    {
@@ -99,7 +99,7 @@ int CommandENVIRON::Execute(vector<string> argVector)
 {
    cout << endl;
    //Execute environ command
-
+    // loop thru and print all the shell environment variables
    for (map<string, string>::iterator it = environment.begin(); it != environment.end(); it++)
    {
       string envString = it->first + "=" + it->second;
@@ -112,22 +112,22 @@ int CommandCHDIR::Execute(vector<string> argVector)
 {
      if(argVector.size() == 2)
     {
-        string pathString = environment["CWD"];
-        if (argVector[1].find("..") != string::npos)
+        string pathString = environment["CWD"]; //get the shell environments working path
+        if (argVector[1].find("..") != string::npos) // if '..' :move down directory
         {
-            size_t parentDir = pathString.find_last_of('/', string::npos);
-            pathString.erase(parentDir,string::npos);
+            size_t parentDir = pathString.find_last_of('/', string::npos); // position of last /
+            pathString.erase(parentDir,string::npos); // erase everything after
         }
         else if (argVector[1].find(".") != string::npos)
         {
 
-            pathString = pathString + argVector[1].substr(argVector[1].find_last_of("/"));
+            pathString = pathString + argVector[1].substr(argVector[1].find_last_of("/")); //relative path + new arg
         }
         else
         {
-            pathString = argVector[1];
+            pathString = argVector[1]; //absolute path
         }
-        environment["CWD"] = pathString;
+        environment["CWD"] = pathString; //reset with new dir
     }
    return 0;
 }
@@ -144,9 +144,9 @@ int CommandWAIT::Execute(vector<string> argVector)
     int status;
     if (argVector.size() == 2)
     {
-        pid_t pid = atoi(argVector[1].c_str());
-        if(pid > 0) waitpid(pid,&status,0);
-        else waitpid(0,&status,0);
+        pid_t pid = atoi(argVector[1].c_str()); //convert arg to int
+        if(pid > 0) waitpid(pid,&status,0); // wait on pid
+        else waitpid(0,&status,0); // wait on all pid with parentspid
     }
    return 0;
 }
@@ -170,7 +170,7 @@ int CommandDIR::Execute(vector<string> argVector)
    vector<string> dirContents;
    //GetWorkingDir(workingDir_Cstr, sizeof(workingDir_Cstr));
    //string workingDir(workingDir_Cstr);
-   string workingDir = environment["CWD"];
+   string workingDir = environment["CWD"]; // get the shell directory variable
 
    cout << workingDir << '\n';
 
@@ -178,17 +178,17 @@ int CommandDIR::Execute(vector<string> argVector)
    struct dirent *dirp;
    string DIRstr;
 
-   if ((dp = opendir(workingDir.c_str())) == NULL)
+   if ((dp = opendir(workingDir.c_str())) == NULL) //attempt to open dir
    {
       cout << "\n Failure accessing directory\n";
       return 0;
    }
-   while ((dirp = readdir(dp)) != NULL)
+   while ((dirp = readdir(dp)) != NULL) //loop thru dir files
    {
       if (dirp->d_type == DT_DIR)
       {
          DIRstr = dirp->d_name;
-         if ((DIRstr != ".") && (DIRstr != "..")) cout << "\t <DIR> " << dirp->d_name << '\n';
+         if ((DIRstr != ".") && (DIRstr != "..")) cout << "\t <DIR> " << dirp->d_name << '\n'; //show that its a directory
       }
       else
       {
@@ -219,15 +219,14 @@ int CommandHELP::Execute(vector<string> argVector)
     if ((pid = fork()) == 0)
     {
         fflush(stdout);
-        // executes vi to read the man page text file
-        execlp("vi", "vi", "SimpleManPage",0);
+        execlp("vi", "vi", "SimpleManPage",0);  // executes vi to read the man page text file
         perror("exec error");
         exit(1);
 
     }
     else// for parent loop
     {
-        waitpid(pid, &status, 0);
+        waitpid(pid, &status, 0);//wait for user to exit vi
     }
 
    return 0;
@@ -266,7 +265,7 @@ int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHisto
 
    for (unsigned int i = (ShellCommandHistory->HistorySize() - history_asked - 1); i < ShellCommandHistory->HistorySize() - 1; i++)  // '-1's are so current history command is not printed to console;
    {
-      cout << '\t' << ++count << "  " << ShellCommandHistory->Get(i) << '\n';
+      cout << '\t' << ++count << "  " << ShellCommandHistory->Get(i) << '\n'; //loop thru and cout
    }
    return 0;
 }
@@ -276,18 +275,18 @@ int CommandKILL::Execute(vector<string> argVector)
     int pid =0;
     int sig =0;
     int status;
-    if(argVector.size() == 2)
+    if(argVector.size() == 2) // default to SIGTERM
     {
-        pid = atoi(argVector[1].c_str());
-        kill(pid,SIGTERM);
-        waitpid(pid,&status, 0);
+        pid = atoi(argVector[1].c_str()); //convert to pid_t
+        kill(pid,SIGTERM); //pass to pid
+        waitpid(pid,&status, 0); //wait for it to be killed
     }
-    else if(argVector.size()==3)
+    else if(argVector.size()==3) // signal arg recieved
     {
-        pid = atoi(argVector[2].c_str());
-        sig = abs (atoi(argVector[1].c_str()));
-        kill(pid,sig);
-        waitpid(pid,&status, 0);
+        pid = atoi(argVector[2].c_str()); //convert signal to int
+        sig = abs (atoi(argVector[1].c_str())); // absolute value of signal (ex.'-9')
+        kill(pid,sig); //pass to pid
+        waitpid(pid,&status, 0); //wait for it to be killed
     }
 return 0;
 }
@@ -311,47 +310,47 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
       background = true;
       argVector.pop_back();
    }
-   if (argVector[0].find("..") != string::npos)
+   if (argVector[0].find("..") != string::npos) //go back directories for each set of '..'s
    {
-        pathString = string(workingDir_Cstr);
-        while(delimiter != string::npos)
+        pathString = string(workingDir_Cstr); //current dir
+        while(delimiter != string::npos) //keep searching for '..'
         {
           delimiter = argVector[0].find("..",++delimiter);
 
-          size_t parentDir = pathString.find_last_of('/', string::npos);
-          pathString.erase(parentDir,string::npos);
-          if (multiParent)
+          size_t parentDir = pathString.find_last_of('/', string::npos); //location of last '/'
+          pathString.erase(parentDir,string::npos); //erase everything past last '/'
+          if (multiParent) //if more than 1 '..' found
           {
-            size_t parentDir = pathString.find_last_of('/', string::npos);
+            size_t parentDir = pathString.find_last_of('/', string::npos);//erase another dir level
             pathString.erase(parentDir,string::npos);
           }
-          size_t comName = argVector[0].find_last_of('/', string::npos);
-          pathString.append(argVector[0].substr(comName, string::npos));
-          multiParent = true;
+          size_t comName = argVector[0].find_last_of('/', string::npos); //only the command name
+          pathString.append(argVector[0].substr(comName, string::npos)); //append the command name to the resized path
+          multiParent = true; //for the next loop thru
         }
         delimiter = 0;
-      cout << pathString << '\n';
+      //cout << pathString << '\n';
    }
-       else if (argVector[0].find(".") != string::npos)
+       else if (argVector[0].find(".") != string::npos) //relative path '.'
        {
-          pathString = string(workingDir_Cstr);
+          pathString = string(workingDir_Cstr); //current dir
           //pathString += "/";
-          size_t comName = argVector[0].find_last_of('.', string::npos) + 1;
-          pathString.append(argVector[0], comName, string::npos);
-          cout << pathString << '\n';
+          size_t comName = argVector[0].find_last_of('.', string::npos) + 1; // command name only
+          pathString.append(argVector[0], comName, string::npos); // append command name to current path
+        //  cout << pathString << '\n';
        }
        else
        {
-          pathString = argVector[0];
+          pathString = argVector[0]; //absolute path only, or search thru PATH variable
        }
 
    // Since the execve() function takes char*, argVector has to be modified. vc is the modified char** equivalent of argVector
    // char *convert(const string & s) defined in SupportingFunctions.h
    transform(argVector.begin(), argVector.end(), back_inserter(vc), convert);
-   vc.push_back(NULL);
+   vc.push_back(NULL); // exec needs null terminated
 
-   if ((pid = fork()) == 0) {
-      //Child process
+   if ((pid = fork()) == 0) {      //Child process
+
       fflush(stdout);
 
       if (execvp(pathString.c_str(), &vc[0]))
@@ -362,20 +361,20 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
    }
    else{ //Parent process
       // fflush(stdout);
-      cout << "Parent process waiting..." << endl;
-      if (!background)
+//      cout << "Parent process waiting..." << endl;
+      if (!background) //foreground command
       {
-         Command::localVariable["foregroundPIDval"] = to_string(pid);
-         waitpid(pid, &status, 0);
-         Command::localVariable["?"] = to_string(status);
+         Command::localVariable["foregroundPIDval"] = to_string(pid); //push the running pid to variable
+         waitpid(pid, &status, 0); //wait for foreground command to finish
+         Command::localVariable["?"] = to_string(status); //push the return value to ? variable
          if (status != 0){
             cerr << "Child process end error!" << endl;
             kill(pid, SIGKILL);
          }
       }
-      else
+      else //background command, dont wait
       {
-         Command::localVariable["!"] = to_string(pid);
+         Command::localVariable["!"] = to_string(pid); //push running pid to ! variable
       }
    }
 
@@ -385,3 +384,4 @@ int CommandEXTERNAL::Execute(vector<string> argVector)
 
    return 0;
 }
+
