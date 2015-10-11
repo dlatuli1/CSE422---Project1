@@ -4,7 +4,7 @@ CC	= g++
 # compiler flags:
 # -O2	optimization flag
 # -Wall	displays compiler warnings
-FLAGS	= -O2 -Wall
+FLAGS	= -O2 -Wall -w
 
 TARGET	= sish
 
