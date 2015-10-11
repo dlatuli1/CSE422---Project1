@@ -1,5 +1,5 @@
 clear warnings
-do CHDIR
+do CHDIR                                          - pending review
 do output redirection
 implement pipes                                   - Todd
 implement -x
