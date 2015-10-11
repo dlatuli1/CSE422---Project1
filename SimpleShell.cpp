@@ -342,6 +342,8 @@ void SimpleShell::InitEnvironment()
    char * pathEnv = getenv("PATH");
    string toMap(homeDir);
    string pathMap(pathEnv);
+   ShellCommand->environment["home"] = toMap;
+   ShellCommand->environment["CWD"] = toMap;
    toMap += "/sish";
    ShellCommand->environment["shell"] = toMap;
    ShellCommand->environment["PATH"] = pathMap;
