@@ -205,6 +205,12 @@ int SimpleShell::ParseInputLine()
    if (ShellCommandHistory->HistorySize() >= 100) ShellCommandHistory->TrimOld(); //limit history deque size to 100
    ShellCommandHistory->PushNew(input);
 
+   if(input.find('#') != string::npos)
+   {
+      input.erase(input.find('#'), string::npos);
+   }
+
+
    while (delimiter != string::npos)
    {
       delimiter = input.find(' ');
