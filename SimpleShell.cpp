@@ -234,7 +234,7 @@ int SimpleShell::ParseInputLine()
    if (ShellCommandHistory->HistorySize() >= 100) ShellCommandHistory->TrimOld(); //limit history deque size to 100
    ShellCommandHistory->PushNew(input);
 
-   if(input.find('#') != string::npos)
+   if(input.find('#') != string::npos)//handles #comments
    {
       input.erase(input.find('#'), string::npos);
    }
@@ -276,8 +276,6 @@ int SimpleShell::ParseInputLine(std::string repeated)
 
 // subs in variable values before commands are exectuted - Called by ParseInputLine()
 // will erase vector value if found that user is trying to set a special variable to something else
-// need to work on ! and ? - values from foreground command and background command.
-// may want to look into implications with export/unexport?
 // echo will not be effected - is this right? i think so
 // History deque will not be effected
 void SimpleShell::VariableSub()
@@ -290,8 +288,8 @@ void SimpleShell::VariableSub()
 
    shellPid << getppid(); //should it be getpid??
 
-   if (argVector[0] != "echo") //  ignore this for echo
-   {
+ //  if (argVector[0] != "echo") //  ignore this for echo
+  // {
       for (unsigned int i = 0; i < argVector.size(); i++)
       {
          variablePlace = argVector[i].find('$');
@@ -311,7 +309,7 @@ void SimpleShell::VariableSub()
                }
                break;
             case '?':
-               if ((argVector[i] != "set") || (i == 2)) argVector[i] = Command::localVariable["?"];			// hmm need to work on foreground stuff
+               if ((argVector[i] != "set") || (i == 2)) argVector[i] = Command::localVariable["?"];			//return value of last foreground command
                else
                {
                   argVector.erase(argVector.begin() + i);
@@ -319,7 +317,7 @@ void SimpleShell::VariableSub()
                }
                break;
             case '!':
-               if ((argVector[0] != "set") || (i == 2)) argVector[i] = Command::localVariable["!"];			//hmmx2 need to work on background stuff
+               if ((argVector[0] != "set") || (i == 2)) argVector[i] = Command::localVariable["!"];			// pid of background command
                else
                {
                   argVector.erase(argVector.begin() + i);
@@ -330,7 +328,6 @@ void SimpleShell::VariableSub()
                if ((ShellCommand->localVariable.find(varString)) != (Command::localVariable.end()))		// search for variable name in locals
                {
                   argVector[i].replace(variablePlace, string::npos, Command::localVariable[varString]);	//replace $variable in argVector with localVar value
-                  hasLocal = true;
                }
                else
                {
@@ -339,24 +336,24 @@ void SimpleShell::VariableSub()
             }
          }
       }
-   }
+   //}
    return;
 }
 
 void SimpleShell::InitEnvironment()
 {
-   char * homeDir = getenv("PWD");
-   char * pathEnv = getenv("PATH");
+   char * homeDir = getenv("PWD"); // get PWD from env
+   char * pathEnv = getenv("PATH");// get PATH from env
    string toMap(homeDir);
    string pathMap(pathEnv);
-   ShellCommand->environment["home"] = toMap;
-   ShellCommand->environment["CWD"] = toMap;
+   ShellCommand->environment["home"] = toMap;//push to shell env
+   ShellCommand->environment["CWD"] = toMap; //push to shell env
    toMap += "/sish";
-   ShellCommand->environment["shell"] = toMap;
-   ShellCommand->environment["PATH"] = pathMap;
-   ShellCommand->environment["parent"] = toMap;
-   Command::localVariable["foregroundPIDval"] = "0";
-   setenv("parent", toMap.c_str(), 1);
+   ShellCommand->environment["shell"] = toMap; //push to shell env
+   ShellCommand->environment["PATH"] = pathMap; //push to shell env
+   ShellCommand->environment["parent"] = toMap; //push to shell env
+   Command::localVariable["foregroundPIDval"] = "0"; //push to localVar map
+   setenv("parent", toMap.c_str(), 1);//push to env
 
    return;
 }
@@ -391,36 +388,36 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else if (argVector[0] == "help")     ((CommandHELP*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "pause")    return ((CommandPAUSE*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "history")  ((CommandHISTORY*)ShellCommand)->Execute(argVector, ShellCommandHistory);
-   else if (argVector[0] == "repeat")
+   else if (argVector[0] == "repeat") //recursively call the execute function
    {
         fflush(stdin);
         if(argVector.size() == 1)
         {
-            cout << '\n' << ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2) << '\n';
-            ParseInputLine(ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2));
-            if (argVector[0] == "repeat")
+            cout << '\n' << ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2) << '\n'; //push the latest history command to shell
+            ParseInputLine(ShellCommandHistory->Get(ShellCommandHistory->HistorySize() - 2)); // repopulate argvector
+            if (argVector[0] == "repeat") //dont repeat a repeat
             {
                 cout << '\n' << "Please Dont Repeat a Repeat Command, way too recursive for me" << '\n';
                 return Command::Go;
             }
             CheckPiped();
-            ShellCommand->shellStatus = ExecuteCommand();
+            ShellCommand->shellStatus = ExecuteCommand(); //recursively call execute
 
         }
         else if(argVector.size() == 2)
         {
             toInt = atoi(argVector[1].c_str());
-            cout << '\n' << ShellCommandHistory->Get(toInt - 1) << '\n';
+            cout << '\n' << ShellCommandHistory->Get(toInt - 1) << '\n'; //push the desired history command to shell
             if((toInt > 0)&&(toInt <= ShellCommandHistory->HistorySize()))
             {
-                ParseInputLine(ShellCommandHistory->Get(toInt - 1));
+                ParseInputLine(ShellCommandHistory->Get(toInt - 1)); //repopulate the argvector with desired history command
                 if (argVector[0] == "repeat")
                 {
                     cout << '\n' << "Please Dont Repeat a Repeat Command, way too recursive for me" << '\n';
                     return Command::Go;
                 }
                 CheckPiped();
-                ShellCommand->shellStatus = ExecuteCommand();
+                ShellCommand->shellStatus = ExecuteCommand(); // recursively call execute
             }
         }
    }
