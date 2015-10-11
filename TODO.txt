@@ -1,21 +1,21 @@
 clear warnings
-fix bug on exit                   - Corey
-*if time explore better CLR       - Corey
-*if time explore better SHOW      - David
+fix bug on exit                                   - Corey // seg fault only when exit is first command. if time fix, otherwise ship it
+*if time explore better CLR                       - Corey
+*if time explore better SHOW                      - David
 do CHDIR
-double check SIGNALS work         - David                 //looks good
+double check SIGNALS work                         - David //looks good
 do REPEAT                                         - David //should be done - check after piping
 do KILL                                           - David //Looks good
 do output redirection
-implement pipes                                - Todd
-add line to put state back in Go after PAUSE  - David //Looks good
-implement WAIT command                        - David //Looks good
+implement pipes                                   - Todd
+add line to put state back in Go after PAUSE      - David //Looks good
+implement WAIT command                            - David //Looks good
 implement help command (write man pages)
-implement debug level                          -Corey
+implement debug level                             - Corey
 implement -x
-finish -f (with arguments) (and search paths)	-Corey
-do . and .. (with slash)                      -David  //looks good
+finish -f (with arguments) (and search paths)	    - Corey
+do . and .. (with slash)                          - David  //looks good
 stdin/stdout redirection
-parse out muliple spaces		               	-David    //looks good
-implement # for comments                    -David    //looks good
+parse out muliple spaces		               	      - David  //looks good
+implement # for comments
 need to ignore blank commands
