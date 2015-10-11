@@ -240,7 +240,7 @@ int SimpleShell::ParseInputLine()
    }
 
 
-   while (delimiter != string::npos)
+   while (delimiter != string::npos)//pushed command arguments to vector - space delimited
    {
       delimiter = input.find(' ');
       if (delimiter != string::npos)
@@ -254,13 +254,13 @@ int SimpleShell::ParseInputLine()
    return 0;
 }
 
-int SimpleShell::ParseInputLine(std::string repeated)
+int SimpleShell::ParseInputLine(std::string repeated) //overloaded function only used for the repeat command
 {
-    argVector.clear();
+    argVector.clear(); //remakes the vector
    size_t delimiter = 0;
 
 
-   while (delimiter != string::npos)
+   while (delimiter != string::npos) //re-populates the argVector with the repeated command
    {
       delimiter = repeated.find(' ');
       if (delimiter != string::npos)
