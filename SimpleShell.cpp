@@ -31,7 +31,7 @@ void SimpleShell::ShellLoop()
       ParseInputLine();
 
       bool blankCommand = true;
-      for (int i = 0; i < argVector.size(); i++)
+      for (unsigned int i = 0; i < argVector.size(); i++)
       {
          if (!(argVector[i] == " ") && !(argVector[i] == "")) blankCommand = false;
       }
@@ -59,7 +59,7 @@ void SimpleShell::ShellLoop()
                
                //construct argment list for executable
                char** argList1 = new char* [pipedVector.size()];
-               for(int i = 0; i < pipedVector[0].length(); i++){
+               for(unsigned int i = 0; i < pipedVector[0].length(); i++){
                    argList1[i] = strdup(pipedVector[0].c_str());
                }
                argList1[pipedVector.size()] = (char*)0;
@@ -94,7 +94,7 @@ void SimpleShell::ShellLoop()
                
                //construct argment list for executable
                char** argList2 = new char* [pipedVector[1].length()];
-               for(int i = 0; i < pipedVector[1].length() - 1; i++){
+               for(unsigned int i = 0; i < pipedVector[1].length() - 1; i++){
                    argList2[i] = strdup((char *)pipedVector[1][i]);
                }
                argList2[pipedVector[1].length() - 1] = (char*)0;
