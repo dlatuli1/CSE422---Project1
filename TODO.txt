@@ -4,9 +4,9 @@ do output redirection
 implement pipes                                   - Todd
 implement help command (write man pages)
 implement -x
-finish -f (with arguments) (and search paths)	    - Corey
 stdin/stdout redirection
 
+finish -f (with arguments) (and search paths)	    - Corey //argments are done, need to do search paths)
 *if time explore better CLR                       - Corey
 *if time explore better SHOW                      - David
 
