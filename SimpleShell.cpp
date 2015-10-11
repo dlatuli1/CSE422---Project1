@@ -163,6 +163,10 @@ void SimpleShell::SetFileInputMode(bool fim, string input)
    }
 }
 
+void SimpleShell::SetFromCommandLine(vector<string> tempVector)
+{
+   ((CommandSET*)ShellCommand)->Execute(tempVector);
+}
 
 void SimpleShell::SetDebugLevel(int dl)
 {
