@@ -24,8 +24,8 @@ int main(int argc, char* argv[])
       }
       case 'd':
       {
-         //do debug level stuff
          i++;
+         SISH->SetDebugLevel(atoi(argv[i]));
          break;
       }
       default:
