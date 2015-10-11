@@ -287,6 +287,14 @@ Usage:
 Options
 
 	help takes no arguments. 
+Screen Modifiers:
+	^F       move forward one screen
+	^B       move backward one line
+	^D       move forward one half screen
+	^U       move backward one half screen
+To quit help:
+	type: ":quit" and press enter
+
 
 ---------------------------------------------------------------------------------------------------------------------------------
 
