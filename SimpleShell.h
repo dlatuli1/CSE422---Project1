@@ -29,6 +29,7 @@ public:
    void ShellLoop();
 
    void SetFileInputMode(bool fim, string input);
+   void SetFromCommandLine(vector<string> tempVector);
    void SetDebugLevel(int dl);
    void SetVariableSubstitution(bool vs);
 
