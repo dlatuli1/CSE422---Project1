@@ -193,18 +193,23 @@ int CommandECHO::Execute(vector<string> argVector)
 
 int CommandHELP::Execute(vector<string> argVector)
 {
-    ifstream manPage;
-    string line;
-    manPage.open("SimpleManPage");
-    if (!manPage)
+    pid_t pid;
+    int status;
+    // child loop after forking
+    if ((pid = fork()) == 0)
     {
-        cout << "\nUnable to open file\n";
+        fflush(stdout);
+        // executes vi to read the man page text file
+        execlp("vi", "vi", "SimpleManPage",0);
+        perror("exec error");
+        exit(1);
+
     }
-    while (getline(manPage,line))
+    else// for parent loop
     {
-        cout << line << endl ;
+        waitpid(pid, &status, 0);
     }
-    manPage.close();
+
    return 0;
 }
 /*
