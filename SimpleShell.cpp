@@ -46,7 +46,7 @@ void SimpleShell::ShellLoop()
            }
            else if(pid1 == 0){
                
-               cout << "Child 1 excuting..." << endl;
+               if (debugLevel >= 1) cout << "Child 1 excuting..." << endl;
                
                //construct argment list for executable
                char** argList1 = new char* [pipedVector.size()];
@@ -70,7 +70,7 @@ void SimpleShell::ShellLoop()
            }
            
            pid_t w1 = waitpid(pid1, &status, WUNTRACED | WCONTINUED);
-           cout << "Wait process 1.." << endl;
+           if (debugLevel >= 1) cout << "Wait process 1.." << endl;
            
            //For child two
            pid2 = fork();
@@ -81,7 +81,7 @@ void SimpleShell::ShellLoop()
                continue;
            }
            else if(pid2 == 0){
-               cout << "Child 2 excuting..." << endl;
+               if (debugLevel >= 1) cout << "Child 2 excuting..." << endl;
                
                //construct argment list for executable
                char** argList2 = new char* [pipedVector[1].length()];
@@ -110,11 +110,11 @@ void SimpleShell::ShellLoop()
            }
            
            //Go back to parent process
-           cout << "Child process waiting..." << endl;
+           if (debugLevel >= 1) cout << "Child process waiting..." << endl;
            close(p[0]);
            close(p[1]);
            pid_t w2 = waitpid(pid2, &status, WUNTRACED | WCONTINUED);
-           cout << "Go back to parent" << endl;
+           if (debugLevel >= 1) cout << "Go back to parent" << endl;
        }
 
       if (ShellCommand->shellStatus == Command::Go)
@@ -122,7 +122,7 @@ void SimpleShell::ShellLoop()
          ShellCommand->shellStatus = ExecuteCommand();
       }
 
-      if (debugLevel >= 1)
+      if (debugLevel >= 2)
       {
          char temp;
          cout << "Press <ENTER> to continue...";
@@ -154,6 +154,14 @@ void SimpleShell::SetFileInputMode(bool fim, string input)
       fileInputMode = false;
    }
 }
+
+
+void SimpleShell::SetDebugLevel(int dl)
+{
+   this->debugLevel = dl;
+   cout << "Debug level set to " << dl << endl;
+}
+
 
 int SimpleShell::ParseInputLine()
 {
@@ -334,8 +342,10 @@ void SimpleShell::InitEnvironment()
 
 Command::ShellStates SimpleShell::ExecuteCommand()
 {
+   if (debugLevel >= 2) cout << "Executing " << argVector[0] << " command" << endl;
+
    unsigned int toInt=0;
-   if (argVector[0] == "show")     ((CommandSHOW*)ShellCommand)->Execute(argVector);
+   if (argVector[0] == "show")          ((CommandSHOW*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "set")      ((CommandSET*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "unset")    ((CommandUNSET*)ShellCommand)->Execute(argVector);
    else if (argVector[0] == "export")   ((CommandEXPORT*)ShellCommand)->Execute(argVector);
@@ -390,7 +400,7 @@ Command::ShellStates SimpleShell::ExecuteCommand()
    else if (argVector[0] == "kill")     ((CommandKILL*)ShellCommand)->Execute(argVector);
    else
    {
-      cout << "EXTERNAL COMMAND" << endl;
+      if (debugLevel >= 1) cout << "EXTERNAL COMMAND" << endl;
       ((CommandEXTERNAL*)ShellCommand)->Execute(argVector);
    }
 
