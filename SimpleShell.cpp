@@ -28,6 +28,14 @@ void SimpleShell::ShellLoop()
    {
       argVector.clear();
       ParseInputLine();
+
+      bool blankCommand = true;
+      for (int i = 0; i < argVector.size(); i++)
+      {
+         if (!(argVector[i] == " ") && !(argVector[i] == "")) blankCommand = false;
+      }
+      if (blankCommand) continue;
+
        if (CheckPiped())
        {
            int status;
