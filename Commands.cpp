@@ -18,7 +18,6 @@ int Command::Execute()
 
 int CommandSHOW::Execute(vector<string> argVector)
 {
-   cout << "Executing show command" << endl;
    //Execute show command
    for (unsigned int i = 1; i < argVector.size(); i++)
    {
@@ -29,7 +28,6 @@ int CommandSHOW::Execute(vector<string> argVector)
 
 int CommandSET::Execute(vector<string> argVector)
 {
-   cout << "Executing set command" << endl;
    //Execute set command
    if (argVector.size() == 3)
    {
@@ -44,7 +42,6 @@ int CommandSET::Execute(vector<string> argVector)
 
 int CommandUNSET::Execute(vector<string> argVector)
 {
-   cout << "Executing unset command" << endl;
    //Execute unset command
    if (argVector.size() == 2)
    {
@@ -59,7 +56,6 @@ int CommandUNSET::Execute(vector<string> argVector)
 
 int CommandEXPORT::Execute(vector<string> argVector)
 {
-   cout << "Executing export command" << endl;
    //Execute export command
    if (argVector.size() == 3)
    {
@@ -82,7 +78,6 @@ int CommandEXPORT::Execute(vector<string> argVector)
 
 int CommandUNEXPORT::Execute(vector<string> argVector)
 {
-   cout << "Executing unexport command" << endl;
    //Execute unexport command
    if (argVector.size() == 2)
    {
@@ -115,14 +110,12 @@ int CommandENVIRON::Execute(vector<string> argVector)
 
 int CommandCHDIR::Execute(vector<string> argVector)
 {
-   cout << "Executing chdir command" << endl;
    //Execute chdir command
    return 0;
 }
 
 int CommandEXIT::Execute(vector<string> argVector)
 {
-   cout << "Executing exit command" << endl;
    //Execute exit command
 
    return atoi(argVector[1].c_str());
@@ -133,7 +126,6 @@ int CommandWAIT::Execute(vector<string> argVector)
     int status;
     if (argVector.size() == 2)
     {
-        cout << "Executing wait command" << endl;
         pid_t pid = atoi(argVector[1].c_str());
         if(pid > 0) waitpid(pid,&status,0);
         else waitpid(0,&status,0);
@@ -144,7 +136,6 @@ int CommandWAIT::Execute(vector<string> argVector)
 
 int CommandCLR::Execute(vector<string> argVector)
 {
-   cout << "Executing clr command" << endl;
    //Execute clr command
 
    //There's no perfect way to do this that is portable
@@ -155,7 +146,6 @@ int CommandCLR::Execute(vector<string> argVector)
 
 int CommandDIR::Execute(vector<string> argVector)
 {
-   cout << "Executing dir command" << endl;
    //Execute dir command
    char workingDir_Cstr[FILENAME_MAX];
    vector<string> dirContents;
@@ -192,7 +182,6 @@ int CommandDIR::Execute(vector<string> argVector)
 
 int CommandECHO::Execute(vector<string> argVector)
 {
-   cout << "Executing echo command" << endl;
    //Execute echo command
    for (unsigned int i = 1; i < argVector.size(); i++)
    {
@@ -204,7 +193,6 @@ int CommandECHO::Execute(vector<string> argVector)
 
 int CommandHELP::Execute(vector<string> argVector)
 {
-   cout << "Executing help command" << endl;
    //Execute help command
    return 0;
 }
@@ -217,7 +205,6 @@ int CommandREPEAT::Execute(vector<string> argVector)
 */
 Command::ShellStates CommandPAUSE::Execute(vector<string> argVector)
 {
-   cout << "Executing pause command" << endl;
    //Execute pause command
 
    cout << "\n------------------------------\n\tsish paused:\n\tPress Enter to resume\n------------------------------\n";
@@ -230,7 +217,6 @@ Command::ShellStates CommandPAUSE::Execute(vector<string> argVector)
 
 int CommandHISTORY::Execute(vector<string> argVector, History* ShellCommandHistory)
 {
-   cout << "Executing history command" << endl;
    unsigned int count = 0, history_asked = 0;
    if (argVector.size() > 1)
    {
