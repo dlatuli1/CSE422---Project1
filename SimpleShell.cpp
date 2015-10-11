@@ -27,6 +27,7 @@ void SimpleShell::ShellLoop()
    for (;;)
    {
       argVector.clear();
+      hasLocal = false;
       ParseInputLine();
 
       bool blankCommand = true;
@@ -166,6 +167,11 @@ void SimpleShell::SetFileInputMode(bool fim, string input)
 void SimpleShell::SetFromCommandLine(vector<string> tempVector)
 {
    ((CommandSET*)ShellCommand)->Execute(tempVector);
+}
+
+void SimpleShell::SetVariableSubstitution()
+{
+   variableSubstitution = true;
 }
 
 void SimpleShell::SetDebugLevel(int dl)
@@ -324,6 +330,7 @@ void SimpleShell::VariableSub()
                if ((ShellCommand->localVariable.find(varString)) != (Command::localVariable.end()))		// search for variable name in locals
                {
                   argVector[i].replace(variablePlace, string::npos, Command::localVariable[varString]);	//replace $variable in argVector with localVar value
+                  hasLocal = true;
                }
                else
                {
@@ -356,6 +363,12 @@ void SimpleShell::InitEnvironment()
 
 Command::ShellStates SimpleShell::ExecuteCommand()
 {
+   if(variableSubstitution && hasLocal)
+   {
+      cout << argVector[0] << " ";
+      ((CommandECHO*)ShellCommand)->Execute(argVector);
+   }
+
    if (debugLevel >= 2) cout << "Executing " << argVector[0] << " command" << endl;
 
    unsigned int toInt=0;
