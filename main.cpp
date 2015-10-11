@@ -4,7 +4,7 @@ int main(int argc, char* argv[])
 {
    SimpleShell* SISH = new SimpleShell();
 
-   for (int i = 1; i < argc - 1; i++)
+   for (int i = 1; i < argc; i++)
    {
       char c = argv[i][1];
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
       }
       case 'x':
       {
-         //do variable substitution stuff
+         SISH->SetVariableSubstitution();
          break;
       }
       case 'd':
