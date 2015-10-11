@@ -193,7 +193,18 @@ int CommandECHO::Execute(vector<string> argVector)
 
 int CommandHELP::Execute(vector<string> argVector)
 {
-   //Execute help command
+    ifstream manPage;
+    string line;
+    manPage.open("SimpleManPage");
+    if (!manPage)
+    {
+        cout << "\nUnable to open file\n";
+    }
+    while (getline(manPage,line))
+    {
+        cout << line << endl ;
+    }
+    manPage.close();
    return 0;
 }
 /*
