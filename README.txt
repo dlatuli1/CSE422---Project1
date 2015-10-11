@@ -1,5 +1,5 @@
 # CSE422---Project1
-Programed by:
+Programmed by:
   Corey Glaser
   David Latulipe
   Tan "Todd" Liuyuan
